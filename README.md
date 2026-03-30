@@ -16,6 +16,10 @@ Inspirado no fluxo de debugging de software, o sistema permite que o usuário:
 - Aplique "refatorações" (mudanças de comportamento ou pensamento)
 - Acompanhe evolução ao longo do tempo
 
+- trello do repositorio:
+
+      https://trello.com/b/e6nq2Xog/debugme
+
 ---
 
 ## 🎯 Problema
