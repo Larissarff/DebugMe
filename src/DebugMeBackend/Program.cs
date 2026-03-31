@@ -3,7 +3,7 @@ using DebugMeBackend.Repositories;
 using DebugMeBackend.Repositories.Interfaces;
 using DebugMeBackend.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
