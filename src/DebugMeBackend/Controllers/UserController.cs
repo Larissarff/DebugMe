@@ -16,7 +16,7 @@ namespace DebugMeBackend.Controllers
         }
 
         [HttpPost("create")]
-        public ActionResult<UserResponseDto> Create([FromBody] CreateUserDto dto)
+        public async Task<ActionResult<UserResponseDto>> Create([FromBody] CreateUserDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -25,7 +25,7 @@ namespace DebugMeBackend.Controllers
 
             try
             {
-                UserResponseDto createdUser = _userService.Create(dto);
+                UserResponseDto createdUser = await _userService.CreateAsync(dto);
 
                 return CreatedAtAction(
                     nameof(GetById),
@@ -40,14 +40,14 @@ namespace DebugMeBackend.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult Login([FromBody] LoginUserDto dto)
+        public async Task<ActionResult> Login([FromBody] LoginUserDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
 
-            bool success = _userService.Login(dto);
+            bool success = await _userService.LoginAsync(dto);
 
             if (!success)
             {
@@ -58,16 +58,16 @@ namespace DebugMeBackend.Controllers
         }
 
         [HttpGet("all")]
-        public ActionResult<List<UserResponseDto>> GetAll()
+        public async Task<ActionResult<List<UserResponseDto>>> GetAll()
         {
-            List<UserResponseDto> users = _userService.GetAll();
+            List<UserResponseDto> users = await _userService.GetAllAsync();
             return Ok(users);
         }
 
         [HttpGet("getById/{id:guid}")]
-        public ActionResult<UserResponseDto> GetById(Guid id)
+        public async Task<ActionResult<UserResponseDto>> GetById(Guid id)
         {
-            UserResponseDto? user = _userService.GetById(id);
+            UserResponseDto? user = await _userService.GetByIdAsync(id);
 
             if (user is null)
             {
@@ -78,7 +78,7 @@ namespace DebugMeBackend.Controllers
         }
 
         [HttpPut("update/{id:guid}")]
-        public ActionResult<UserResponseDto> Update(Guid id, [FromBody] UpdateUserDto dto)
+        public async Task<ActionResult<UserResponseDto>> Update(Guid id, [FromBody] UpdateUserDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -87,7 +87,7 @@ namespace DebugMeBackend.Controllers
 
             try
             {
-                UserResponseDto? updatedUser = _userService.Update(id, dto);
+                UserResponseDto? updatedUser = await _userService.UpdateAsync(id, dto);
 
                 if (updatedUser is null)
                 {
@@ -103,9 +103,9 @@ namespace DebugMeBackend.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        public ActionResult Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
-            bool deleted = _userService.Delete(id);
+            bool deleted = await _userService.DeleteAsync(id);
 
             if (!deleted)
             {
