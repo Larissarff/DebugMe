@@ -1,0 +1,75 @@
+## =========================
+## Build / Output
+## =========================
+bin/
+obj/
+out/
+publish/
+
+## =========================
+## Visual Studio
+## =========================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## =========================
+## Rider / JetBrains
+## =========================
+.idea/
+*.sln.iml
+
+## =========================
+## VS Code
+## =========================
+.vscode/
+
+## =========================
+## Logs
+## =========================
+*.log
+
+## =========================
+## NuGet
+## =========================
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+## =========================
+## Environment / Secrets
+## =========================
+.env
+.env.*
+appsettings.Development.json
+appsettings.*.json
+
+!appsettings.json
+
+## =========================
+## OS Files
+## =========================
+.DS_Store
+Thumbs.db
+
+
+## =========================
+## Entity Framework
+## =========================
+Migrations/*
+
+
+## =========================
+## Publish Profiles
+## =========================
+Properties/PublishProfiles/
+
+## =========================
+## Temporary files
+## =========================
+*.tmp
+*.temp
+*.cache
