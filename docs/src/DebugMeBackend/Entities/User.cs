@@ -1,0 +1,18 @@
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+
+namespace DebugMeBackend.Entities
+{
+    public class User
+    { 
+        public User()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
+
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+    }
+}
