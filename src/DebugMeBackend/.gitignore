@@ -55,12 +55,10 @@ appsettings.*.json
 .DS_Store
 Thumbs.db
 
-
 ## =========================
-## Entity Framework
+## Banco de dados
 ## =========================
-Migrations/*
-
+*.db
 
 ## =========================
 ## Publish Profiles
