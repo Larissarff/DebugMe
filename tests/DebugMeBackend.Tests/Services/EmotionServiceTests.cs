@@ -1,4 +1,3 @@
-using DebugMeBackend.DTOs.User;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Repositories.Interfaces;
 using DebugMeBackend.Services;
@@ -7,28 +6,24 @@ using Moq;
 
 namespace DebugMeBackend.Tests.Services
 {
-
     public class EmotionServiceTests
     {
         [Fact]
         public async Task CreateAsync_ShouldThrowException_WhenNameIsEmpty()
         {
-            // Arrange
-            var repositoryMock = new Mock<IEmotionRepository>();
-            var service = new EmotionService(repositoryMock.Object);
+            Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
+            EmotionService service = new EmotionService(repositoryMock.Object);
 
-            var dto = new CreateEmotionDto
+            Emotion emotion = new Emotion
             {
-                Name = ""
+                Name = "",
+                Description = "Descrição de teste"
             };
 
-            // Act
-            Func<Task> act = async () => await service.CreateAsync(dto);
+            Func<Task> action = async () => await service.CreateAsync(emotion);
 
-            // Assert
-            await act.Should().ThrowAsync<ArgumentException>()
+            await action.Should().ThrowAsync<ArgumentException>()
                 .WithMessage("O nome da emoção é obrigatório.");
         }
     }
-
 }
