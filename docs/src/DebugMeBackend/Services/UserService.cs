@@ -103,5 +103,19 @@ namespace DebugMeBackend.Services
             var hash = sha256.ComputeHash(bytes);
             return Convert.ToBase64String(hash);
         }
+
+        public bool Delete(Guid id)
+        {
+            User? user = _users.FirstOrDefault(u => u.Id == id);
+
+            if (user is null)
+            {
+                return false;
+            }
+
+            _users.Remove(user);
+
+            return true;
+        }
     }
 }
