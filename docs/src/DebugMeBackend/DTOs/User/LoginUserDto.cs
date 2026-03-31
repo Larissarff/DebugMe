@@ -1,7 +1,14 @@
-namespace DebugMeBackend.DTOs.User;
+using System.ComponentModel.DataAnnotations;
 
-public class LoginUserDto
+namespace DebugMeBackend.DTOs.User
 {
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
+    public class LoginUserDto
+    {
+        [Required(ErrorMessage = "O e-mail é obrigatório.")]
+        [EmailAddress(ErrorMessage = "Informe um e-mail válido.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "A senha é obrigatória.")]
+        public string Password { get; set; } = string.Empty;
+    }
 }
