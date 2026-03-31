@@ -10,7 +10,7 @@ namespace DebugMeBackend.Data
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
