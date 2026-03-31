@@ -2,37 +2,46 @@ using System.Security.Cryptography;
 using System.Text;
 using DebugMeBackend.DTOs.User;
 using DebugMeBackend.Entities;
+using DebugMeBackend.Repositories.Interfaces;
 
 namespace DebugMeBackend.Services
 {
     public class UserService
     {
-        private static readonly List<User> _users = new();
+        private readonly IUserRepository _userRepository;
 
-        public UserResponseDto Create(CreateUserDto dto)
+        public UserService(IUserRepository userRepository)
         {
-            var emailAlreadyExists = _users.Any(u => u.Email.ToLower() == dto.Email.ToLower());
+            _userRepository = userRepository;
+        }
 
-            if (emailAlreadyExists)
+        public async Task<UserResponseDto> CreateAsync(CreateUserDto dto)
+        {
+            string normalizedEmail = dto.Email.Trim().ToLower();
+
+            User? existingUser = await _userRepository.GetByEmailAsync(normalizedEmail);
+
+            if (existingUser is not null)
             {
                 throw new InvalidOperationException("Já existe um usuário com este e-mail.");
             }
 
-            var user = new User
+            User user = new User
             {
                 Name = dto.Name.Trim(),
-                Email = dto.Email.Trim().ToLower(),
+                Email = normalizedEmail,
                 PasswordHash = HashPassword(dto.Password)
             };
 
-            _users.Add(user);
+            await _userRepository.AddAsync(user);
+            await _userRepository.SaveChangesAsync();
 
             return MapToResponse(user);
         }
 
-        public UserResponseDto? GetById(Guid id)
+        public async Task<UserResponseDto?> GetByIdAsync(Guid id)
         {
-            var user = _users.FirstOrDefault(u => u.Id == id);
+            User? user = await _userRepository.GetByIdAsync(id);
 
             if (user is null)
             {
@@ -42,80 +51,96 @@ namespace DebugMeBackend.Services
             return MapToResponse(user);
         }
 
-        public List<UserResponseDto> GetAll()
+        public async Task<List<UserResponseDto>> GetAllAsync()
         {
-            return _users.Select(MapToResponse).ToList();
+            List<User> users = await _userRepository.GetAllAsync();
+
+            List<UserResponseDto> response = users
+                .Select(MapToResponse)
+                .ToList();
+
+            return response;
         }
 
-        public bool Login(LoginUserDto dto)
+        public async Task<bool> LoginAsync(LoginUserDto dto)
         {
-            var user = _users.FirstOrDefault(u => u.Email.ToLower() == dto.Email.ToLower());
+            string normalizedEmail = dto.Email.Trim().ToLower();
+
+            User? user = await _userRepository.GetByEmailAsync(normalizedEmail);
 
             if (user is null)
             {
                 return false;
             }
 
-            var passwordHash = HashPassword(dto.Password);
+            string passwordHash = HashPassword(dto.Password);
 
             return user.PasswordHash == passwordHash;
         }
 
-        public UserResponseDto? Update(Guid id, UpdateUserDto dto)
+        public async Task<UserResponseDto?> UpdateAsync(Guid id, UpdateUserDto dto)
         {
-            var user = _users.FirstOrDefault(u => u.Id == id);
+            User? user = await _userRepository.GetByIdAsync(id);
 
             if (user is null)
             {
                 return null;
             }
 
-            var emailAlreadyInUse = _users.Any(u =>
-                u.Id != id &&
-                u.Email.ToLower() == dto.Email.ToLower());
+            string normalizedEmail = dto.Email.Trim().ToLower();
 
-            if (emailAlreadyInUse)
+            User? userWithSameEmail = await _userRepository.GetByEmailAsync(normalizedEmail);
+
+            if (userWithSameEmail is not null && userWithSameEmail.Id != id)
             {
                 throw new InvalidOperationException("Este e-mail já está em uso por outro usuário.");
             }
 
             user.Name = dto.Name.Trim();
-            user.Email = dto.Email.Trim().ToLower();
+            user.Email = normalizedEmail;
+
+            await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
 
             return MapToResponse(user);
         }
 
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            User? user = await _userRepository.GetByIdAsync(id);
+
+            if (user is null)
+            {
+                return false;
+            }
+
+            await _userRepository.DeleteAsync(user);
+            await _userRepository.SaveChangesAsync();
+
+            return true;
+        }
+
         private static UserResponseDto MapToResponse(User user)
         {
-            return new UserResponseDto
+            UserResponseDto response = new UserResponseDto
             {
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
                 CreatedAt = user.CreatedAt
             };
+
+            return response;
         }
 
         private static string HashPassword(string password)
         {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
+            using SHA256 sha256 = SHA256.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(password);
+            byte[] hash = sha256.ComputeHash(bytes);
+            string passwordHash = Convert.ToBase64String(hash);
 
-        public bool Delete(Guid id)
-        {
-            User? user = _users.FirstOrDefault(u => u.Id == id);
-
-            if (user is null)
-            {
-                return false;
-            }
-
-            _users.Remove(user);
-
-            return true;
+            return passwordHash;
         }
     }
 }
