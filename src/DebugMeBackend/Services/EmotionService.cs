@@ -55,8 +55,23 @@ namespace DebugMeBackend.Services
             return await _emotionRepository.GetAllAsync();
         }
 
-        public async Task<Emotion> UpdateAsync(Guid id)
+        public async Task<Emotion> UpdateAsync(Guid id, Emotion emotionEdited)
         {
+            if (id == Guid.Empty)
+            {
+                throw new ArgumentException("Id inválido.");
+            }
+
+            if (emotionEdited is null)
+            {
+                throw new ArgumentNullException(nameof(emotionEdited));
+            }
+
+            if (string.IsNullOrWhiteSpace(emotionEdited.Name))
+            {
+                throw new ArgumentException("O nome da emoção é obrigatório.");
+            }
+
             Emotion? emotion = await _emotionRepository.GetByIdAsync(id);
 
             if (emotion is null)
@@ -64,12 +79,7 @@ namespace DebugMeBackend.Services
                 throw new InvalidOperationException("Emoção não encontrada.");
             }
 
-            if (string.IsNullOrWhiteSpace(emotion.Name))
-            {
-                throw new ArgumentException("O nome da emoção é obrigatório.");
-            }
-
-            string normalizedName = emotion.Name.Trim().ToLower();
+            string normalizedName = emotionEdited.Name.Trim().ToLower();
 
             Emotion? existingEmotion = await _emotionRepository.GetByNameAsync(normalizedName);
 
@@ -79,7 +89,7 @@ namespace DebugMeBackend.Services
             }
 
             emotion.Name = normalizedName;
-            emotion.Description = emotion.Description?.Trim();
+            emotion.Description = emotionEdited.Description?.Trim();
 
             await _emotionRepository.UpdateAsync(emotion);
 
