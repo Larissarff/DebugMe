@@ -1,8 +1,9 @@
 using DebugMeBackend.Entities;
+using DebugMeBackend.Repositories.Interfaces;
 
 namespace DebugMeBackend.Repositories
 {
-    public class EmotionRepository
+    public class EmotionRepository : IEmotionRepository
     {
         private readonly List<Emotion> _emotions;
 
