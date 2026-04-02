@@ -26,7 +26,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=debugme.db"));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEmotionRepository, EmotionRepository>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<EmotionService>();
 
 WebApplication app = builder.Build();
 

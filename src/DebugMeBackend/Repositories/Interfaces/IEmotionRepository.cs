@@ -1,11 +1,14 @@
 using DebugMeBackend.Entities;
 
-public interface IEmotionRepository
+namespace DebugMeBackend.Repositories.Interfaces
 {
-    Task<Emotion?> GetByIdAsync(Guid id);
-    Task<Emotion?> GetByNameAsync(string name);
-    Task<List<Emotion>> GetAllAsync();
-    Task AddAsync(Emotion emotion);
-    Task UpdateAsync(Emotion emotion);
-    Task DeleteAsync(Emotion emotion);
+    public interface IEmotionRepository
+    {
+        Task<Emotion?> GetByIdAsync(Guid id);
+        Task<Emotion?> GetByNameAsync(string name);
+        Task<IEnumerable<Emotion>> GetAllAsync();
+        Task AddAsync(Emotion emotion);
+        Task UpdateAsync(Emotion emotion);
+        Task DeleteAsync(Guid id);
+    }
 }

@@ -1,15 +1,17 @@
 using DebugMeBackend.Entities;
+using Microsoft.EntityFrameworkCore;
+using DebugMeBackend.Data;
 using DebugMeBackend.Repositories.Interfaces;
 
 namespace DebugMeBackend.Services
 {
     public class EmotionService
     {
-        private readonly IEmotionRepository _emotionRepository;
+        private readonly AppDbContext _context;
 
-        public EmotionService(IEmotionRepository emotionRepository)
+        public EmotionService(AppDbContext context)
         {
-            _emotionRepository = emotionRepository;
+            _context = context;
         }
 
         public async Task<Emotion> CreateAsync(Emotion emotion)
@@ -21,7 +23,7 @@ namespace DebugMeBackend.Services
 
             string normalizedName = emotion.Name.Trim().ToLower();
 
-            Emotion? existingEmotion = await _emotionRepository.GetByNameAsync(normalizedName);
+            Emotion? existingEmotion = await _context.Emotions.FirstOrDefaultAsync(e => e.Name == normalizedName);
 
             if (existingEmotion is not null)
             {
@@ -35,67 +37,93 @@ namespace DebugMeBackend.Services
                 Description = emotion.Description?.Trim()
             };
 
-            await _emotionRepository.AddAsync(newEmotion);
+            await _context.AddAsync(newEmotion);
+            await _context.SaveChangesAsync();
 
             return newEmotion;
         }
 
         public async Task<Emotion?> GetByIdAsync(Guid id)
         {
+            Emotion? emotion = await _context.Emotions.FirstOrDefaultAsync(e => e.Id == id);
+            return emotion;
+        }
+        public async Task<Emotion?> GetByNameAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("O nome da emoção é obrigatório.");
+            }
+
+            string normalizedName = name.Trim().ToLower();
+
+            Emotion? emotion = await _context.Emotions
+                .FirstOrDefaultAsync(e => e.Name == normalizedName);
+
+            return emotion;
+        }
+
+        public async Task<IEnumerable<Emotion>> GetAllAsync()
+        {
+            List<Emotion> emotions = await _context.Emotions.ToListAsync();
+            return emotions;
+        }
+
+        public async Task<Emotion> UpdateAsync(Guid id, Emotion emotionEdited)
+        {
             if (id == Guid.Empty)
             {
                 throw new ArgumentException("Id inválido.");
             }
 
-            return await _emotionRepository.GetByIdAsync(id);
-        }
+            if (emotionEdited is null)
+            {
+                throw new ArgumentNullException(nameof(emotionEdited));
+            }
 
-        public async Task<List<Emotion>> GetAllAsync()
-        {
-            return await _emotionRepository.GetAllAsync();
-        }
-
-        public async Task<Emotion> UpdateAsync(Guid id)
-        {
-            Emotion? emotion = await _emotionRepository.GetByIdAsync(id);
+            Emotion? emotion = await _context.Emotions.FirstOrDefaultAsync(e => e.Id == id);
 
             if (emotion is null)
             {
                 throw new InvalidOperationException("Emoção não encontrada.");
             }
 
-            if (string.IsNullOrWhiteSpace(emotion.Name))
+            if (!string.IsNullOrWhiteSpace(emotionEdited.Name))
             {
-                throw new ArgumentException("O nome da emoção é obrigatório.");
+                string normalizedName = emotionEdited.Name.Trim().ToLower();
+
+                Emotion? existingEmotion = await _context.Emotions
+                    .FirstOrDefaultAsync(e => e.Name == normalizedName);
+
+                if (existingEmotion is not null && existingEmotion.Id != id)
+                {
+                    throw new InvalidOperationException("Já existe outra emoção com esse nome.");
+                }
+
+                emotion.Name = normalizedName;
             }
 
-            string normalizedName = emotion.Name.Trim().ToLower();
-
-            Emotion? existingEmotion = await _emotionRepository.GetByNameAsync(normalizedName);
-
-            if (existingEmotion is not null && existingEmotion.Id != id)
+            if (emotionEdited.Description is not null)
             {
-                throw new InvalidOperationException("Já existe outra emoção com esse nome.");
+                emotion.Description = emotionEdited.Description.Trim();
             }
 
-            emotion.Name = normalizedName;
-            emotion.Description = emotion.Description?.Trim();
-
-            await _emotionRepository.UpdateAsync(emotion);
+            await _context.SaveChangesAsync();
 
             return emotion;
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            Emotion? emotion = await _emotionRepository.GetByIdAsync(id);
+            Emotion? emotion = await _context.Emotions.FirstOrDefaultAsync(e => e.Id == id);
 
             if (emotion is null)
             {
                 throw new InvalidOperationException("Emoção não encontrada.");
             }
 
-            await _emotionRepository.DeleteAsync(emotion);
+            _context.Emotions.Remove(emotion);
+            await _context.SaveChangesAsync();
         }
     }
 }
