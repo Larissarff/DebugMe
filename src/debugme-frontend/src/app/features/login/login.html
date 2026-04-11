@@ -1,0 +1,50 @@
+<div class="login-page">
+  <div class="login-card">
+    <h1>DebugMe</h1>
+    <p class="subtitle">Seu espaço para registrar e entender suas emoções</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="seuemail@exemplo.com"
+        />
+
+        <small class="error" *ngIf="submitted && email?.errors?.['required']">
+          O e-mail é obrigatório.
+        </small>
+
+        <small class="error" *ngIf="submitted && email?.errors?.['email']">
+          Informe um e-mail válido.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Digite sua senha"
+        />
+
+        <small class="error" *ngIf="submitted && password?.errors?.['required']">
+          A senha é obrigatória.
+        </small>
+
+        <small class="error" *ngIf="submitted && password?.errors?.['minlength']">
+          A senha deve ter pelo menos 6 caracteres.
+        </small>
+      </div>
+
+      <button type="submit">Entrar</button>
+    </form>
+
+    <p class="footer-text">
+      Acolhimento, clareza e autoconsciência em um só lugar
+    </p>
+  </div>
+</div>
