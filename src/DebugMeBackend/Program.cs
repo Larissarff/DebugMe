@@ -27,8 +27,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEmotionRepository, EmotionRepository>();
+builder.Services.AddScoped<IEventLogRepository, EventLogRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<EmotionService>();
+builder.Services.AddScoped<EventLogService>();
 
 WebApplication app = builder.Build();
 

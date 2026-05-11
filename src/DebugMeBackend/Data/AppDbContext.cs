@@ -12,6 +12,7 @@ namespace DebugMeBackend.Data
 
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Emotion> Emotions { get; set; } = null!;
+        public DbSet<EventLog> EventLogs { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +50,30 @@ namespace DebugMeBackend.Data
 
                 entity.Property(e => e.Description)
                       .HasMaxLength(250);
+            });
+
+            modelBuilder.Entity<EventLog>(entity =>
+            {
+                entity.HasKey(el => el.Id);
+
+                entity.Property(el => el.Description)
+                      .HasMaxLength(500);
+
+                entity.Property(el => el.Intensity)
+                      .IsRequired();
+
+                entity.Property(el => el.EventDate)
+                      .IsRequired();
+
+                entity.HasOne(el => el.User)
+                      .WithMany()
+                      .HasForeignKey(el => el.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(el => el.Emotion)
+                      .WithMany()
+                      .HasForeignKey(el => el.EmotionId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }
