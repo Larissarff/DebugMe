@@ -77,6 +77,10 @@ public class EventLogController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+        catch (ArgumentNullException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("delete/{id:guid}")]

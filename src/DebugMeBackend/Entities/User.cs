@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-
 namespace DebugMeBackend.Entities
 {
     public class User

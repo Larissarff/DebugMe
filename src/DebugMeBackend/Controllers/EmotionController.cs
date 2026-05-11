@@ -26,6 +26,12 @@ namespace DebugMeBackend.Controllers
         public async Task<ActionResult<Emotion>> GetById(Guid id)
         {
             Emotion? emotion = await _emotionService.GetByIdAsync(id);
+
+            if (emotion is null)
+            {
+                return NotFound(new { message = "Emoção não encontrada." });
+            }
+
             return Ok(emotion);
         }
 
@@ -33,6 +39,12 @@ namespace DebugMeBackend.Controllers
         public async Task<ActionResult<Emotion>> GetByName(string name)
         {
             Emotion? emotion = await _emotionService.GetByNameAsync(name);
+
+            if (emotion is null)
+            {
+                return NotFound(new { message = "Emoção não encontrada." });
+            }
+
             return Ok(emotion);
         }
 
