@@ -26,36 +26,6 @@ namespace DebugMeBackend.Services
                 throw new InvalidOperationException("Já existe um usuário com este e-mail.");
             }
 
-            if (string.IsNullOrWhiteSpace(dto.Name))
-            {
-                throw new InvalidOperationException("O nome é obrigatório.");
-            }
-
-            if (dto.Name.Length < 2 || dto.Name.Length > 100)
-            {
-                throw new InvalidOperationException("O nome deve ter entre 2 e 100 caracteres.");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Email))
-            {
-                throw new InvalidOperationException("O e-mail é obrigatório.");
-            }
-
-            if (dto.Email.Length < 5 || dto.Email.Length > 150)
-            {
-                throw new InvalidOperationException("O e-mail deve ter entre 5 e 150 caracteres.");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Password))
-            {
-                throw new InvalidOperationException("A senha é obrigatória.");
-            }
-
-            if (dto.Password.Length < 6 || dto.Password.Length > 100)
-            {
-                throw new InvalidOperationException("A senha deve ter entre 6 e 100 caracteres.");
-            }
-
             User user = new User
             {
                 Name = dto.Name.Trim(),
@@ -64,7 +34,6 @@ namespace DebugMeBackend.Services
             };
 
             await _userRepository.AddAsync(user);
-            await _userRepository.SaveChangesAsync();
 
             return MapToResponse(user);
         }
@@ -117,26 +86,6 @@ namespace DebugMeBackend.Services
                 return null;
             }
 
-            if (string.IsNullOrWhiteSpace(dto.Name))
-            {
-                throw new InvalidOperationException("O nome é obrigatório.");
-            }
-
-            if (dto.Name.Length < 2 || dto.Name.Length > 100)
-            {
-                throw new InvalidOperationException("O nome deve ter entre 2 e 100 caracteres.");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Email))
-            {
-                throw new InvalidOperationException("O e-mail é obrigatório.");
-            }
-
-            if (dto.Email.Length < 5 || dto.Email.Length > 150)
-            {
-                throw new InvalidOperationException("O e-mail deve ter entre 5 e 150 caracteres.");
-            }
-
             string normalizedEmail = dto.Email.Trim().ToLower();
 
             User? userWithSameEmail = await _userRepository.GetByEmailAsync(normalizedEmail);
@@ -150,7 +99,6 @@ namespace DebugMeBackend.Services
             user.Email = normalizedEmail;
 
             await _userRepository.UpdateAsync(user);
-            await _userRepository.SaveChangesAsync();
 
             return MapToResponse(user);
         }
@@ -165,7 +113,6 @@ namespace DebugMeBackend.Services
             }
 
             await _userRepository.DeleteAsync(user);
-            await _userRepository.SaveChangesAsync();
 
             return true;
         }

@@ -34,23 +34,19 @@ namespace DebugMeBackend.Repositories
 
         public async Task AddAsync(User user)
         {
-            await _context.Users.AddAsync(user);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
         }
 
-        public Task UpdateAsync(User user)
+        public async Task UpdateAsync(User user)
         {
             _context.Users.Update(user);
-            return Task.CompletedTask;
+            await _context.SaveChangesAsync();
         }
 
-        public Task DeleteAsync(User user)
+        public async Task DeleteAsync(User user)
         {
             _context.Users.Remove(user);
-            return Task.CompletedTask;
-        }
-
-        public async Task SaveChangesAsync()
-        {
             await _context.SaveChangesAsync();
         }
     }

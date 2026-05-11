@@ -31,10 +31,6 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.AddAsync(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            userRepositoryMock
-                .Setup(repository => repository.SaveChangesAsync())
-                .Returns(Task.CompletedTask);
-
             UserService userService = new UserService(userRepositoryMock.Object);
 
             UserResponseDto result = await userService.CreateAsync(dto);
@@ -47,7 +43,6 @@ namespace DebugMeBackend.Tests.Services
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
             userRepositoryMock.Verify(repository => repository.AddAsync(It.IsAny<User>()), Times.Once);
-            userRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -93,10 +88,6 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.AddAsync(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            userRepositoryMock
-                .Setup(repository => repository.SaveChangesAsync())
-                .Returns(Task.CompletedTask);
-
             UserService userService = new UserService(userRepositoryMock.Object);
 
             UserResponseDto result = await userService.CreateAsync(dto);
@@ -109,7 +100,6 @@ namespace DebugMeBackend.Tests.Services
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
             userRepositoryMock.Verify(repository => repository.AddAsync(It.IsAny<User>()), Times.Once);
-            userRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -385,9 +375,6 @@ namespace DebugMeBackend.Tests.Services
             userRepositoryMock
                 .Setup(repository => repository.GetByEmailAsync(dto.Email))
                 .ReturnsAsync((User?)null);
-            userRepositoryMock
-                .Setup(repository => repository.SaveChangesAsync())
-                .Returns(Task.CompletedTask);
 
             UserService userService = new UserService(userRepositoryMock.Object);
 
@@ -402,7 +389,6 @@ namespace DebugMeBackend.Tests.Services
 
             userRepositoryMock.Verify(repository => repository.GetByIdAsync(userId), Times.Once);
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
-            userRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -603,10 +589,6 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.DeleteAsync(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            userRepositoryMock
-                .Setup(repository => repository.SaveChangesAsync())
-                .Returns(Task.CompletedTask);
-
             UserService userService = new UserService(userRepositoryMock.Object);
 
             bool result = await userService.DeleteAsync(userId);
@@ -615,7 +597,6 @@ namespace DebugMeBackend.Tests.Services
 
             userRepositoryMock.Verify(repository => repository.GetByIdAsync(userId), Times.Once);
             userRepositoryMock.Verify(repository => repository.DeleteAsync(It.IsAny<User>()), Times.Once);
-            userRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
         }
 
                 [Fact]
@@ -630,14 +611,6 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetByIdAsync(userId))
                 .ReturnsAsync((User?)null);
 
-            userRepositoryMock
-                .Setup(repository => repository.DeleteAsync(It.IsAny<User>()))
-                .Returns(Task.CompletedTask);
-
-            userRepositoryMock
-                .Setup(repository => repository.SaveChangesAsync())
-                .Returns(Task.CompletedTask);
-
             UserService userService = new UserService(userRepositoryMock.Object);
 
             bool result = await userService.DeleteAsync(userId);
@@ -646,7 +619,6 @@ namespace DebugMeBackend.Tests.Services
 
             userRepositoryMock.Verify(repository => repository.GetByIdAsync(userId), Times.Once);
             userRepositoryMock.Verify(repository => repository.DeleteAsync(It.IsAny<User>()), Times.Never);
-            userRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Never);
         }
     }   
 }
