@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{208BA388-4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{20C11271-6382-FCD6-BEAB-7665EF9F12F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugMeBackend", "docs\src\DebugMeBackend\DebugMeBackend.csproj", "{688FE6EF-F09F-2100-522B-C5B5BEF3AD4E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugMeBackend", "src\DebugMeBackend\DebugMeBackend.csproj", "{688FE6EF-F09F-2100-522B-C5B5BEF3AD4E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
