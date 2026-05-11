@@ -1,64 +1,65 @@
+using DebugMeBackend.Data;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace DebugMeBackend.Repositories
 {
     public class EmotionRepository : IEmotionRepository
     {
-        private readonly List<Emotion> _emotions;
+        private readonly AppDbContext _context;
 
-        public EmotionRepository()
+        public EmotionRepository(AppDbContext context)
         {
-            _emotions = new List<Emotion>();
+            _context = context;
         }
 
-        public Task<IEnumerable<Emotion>> GetAllAsync()
+        public async Task<IEnumerable<Emotion>> GetAllAsync()
         {
-            return Task.FromResult(_emotions.AsEnumerable());
+            return await _context.Emotions.ToListAsync();
         }
 
-        public Task<Emotion?> GetByIdAsync(Guid id)
+        public async Task<Emotion?> GetByIdAsync(Guid id)
         {
-            Emotion? emotion = _emotions.FirstOrDefault(e => e.Id == id);
-            return Task.FromResult(emotion);
+            return await _context.Emotions.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public Task<Emotion?> GetByNameAsync(string name)
+        public async Task<Emotion?> GetByNameAsync(string name)
         {
-            Emotion? emotion = _emotions.FirstOrDefault(e => e.Name == name);
-            return Task.FromResult(emotion);
+            return await _context.Emotions.FirstOrDefaultAsync(e => e.Name == name);
         }
 
-        public Task AddAsync(Emotion emotion)
+        public async Task AddAsync(Emotion emotion)
         {
-            _emotions.Add(emotion);
-            return Task.CompletedTask;
+            _context.Emotions.Add(emotion);
+            await _context.SaveChangesAsync();
         }
 
-        public Task UpdateAsync(Emotion emotion)
+        public async Task UpdateAsync(Emotion emotion)
         {
-            Emotion? existingEmotion = _emotions.FirstOrDefault(e => e.Id == emotion.Id);
+            Emotion? existing = await _context.Emotions
+                .FirstOrDefaultAsync(e => e.Id == emotion.Id);
 
-            if (existingEmotion is not null)
+            if (existing is not null)
             {
-                existingEmotion.Name = emotion.Name;
-                existingEmotion.Description = emotion.Description;
-                existingEmotion.UpdatedAt = DateTime.UtcNow;
-            }
+                existing.Name = emotion.Name;
+                existing.Description = emotion.Description;
+                existing.UpdatedAt = DateTime.UtcNow;
 
-            return Task.CompletedTask;
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Emotion emotion)
         {
-            Emotion? emotion = _emotions.FirstOrDefault(e => e.Id == id);
+            Emotion? existing = await _context.Emotions
+                .FirstOrDefaultAsync(e => e.Id == emotion.Id);
 
-            if (emotion is not null)
+            if (existing is not null)
             {
-                _emotions.Remove(emotion);
+                _context.Emotions.Remove(existing);
+                await _context.SaveChangesAsync();
             }
-
-            return Task.CompletedTask;
         }
     }
 }

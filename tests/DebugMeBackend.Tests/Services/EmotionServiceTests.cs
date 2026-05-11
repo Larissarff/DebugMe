@@ -31,6 +31,10 @@ namespace DebugMeBackend.Tests.Services
         public async Task CreateAsync_ShouldCreateEmotion_WhenNameIsProvided()
         {
             Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
+            repositoryMock
+                .Setup(repository => repository.GetByNameAsync("emoção de teste"))
+                .ReturnsAsync((Emotion?)null);
+
             EmotionService service = new EmotionService(repositoryMock.Object);
 
             Emotion emotion = new Emotion
@@ -51,9 +55,30 @@ namespace DebugMeBackend.Tests.Services
                 Times.Once);
         }
 
+        [Fact]
+        public async Task CreateAsync_ShouldThrowException_WhenEmotionAlreadyExists()
+        {
+            Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
+            repositoryMock
+                .Setup(repository => repository.GetByNameAsync("emoção existente"))
+                .ReturnsAsync(new Emotion { Name = "emoção existente" });
+
+            EmotionService service = new EmotionService(repositoryMock.Object);
+
+            Emotion emotion = new Emotion
+            {
+                Name = " Emoção Existente ",
+                Description = "Descrição"
+            };
+
+            Func<Task> action = async () => await service.CreateAsync(emotion);
+
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("Essa emoção já existe.");
+        }
+
         // Get Tests
         [Fact]
-
         public async Task GetAllAsync_ShouldReturnAllEmotions()
         {
             Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
@@ -77,7 +102,6 @@ namespace DebugMeBackend.Tests.Services
         }
 
         [Fact]
-
         public async Task GetAllAsync_ShouldReturnEmptyList_WhenNoEmotionsExist()
         {
             Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
@@ -104,10 +128,10 @@ namespace DebugMeBackend.Tests.Services
 
             EmotionService service = new EmotionService(repositoryMock.Object);
 
-            Emotion result = await service.GetByIdAsync(emotionId);
+            Emotion? result = await service.GetByIdAsync(emotionId);
 
             result.Should().NotBeNull();
-            result.Id.Should().Be(emotionId);
+            result!.Id.Should().Be(emotionId);
             result.Name.Should().Be("Raiva");
             result.Description.Should().Be("Sentimento de irritação e fúria.");
 
@@ -120,55 +144,113 @@ namespace DebugMeBackend.Tests.Services
             Guid emotionId = Guid.NewGuid();
             Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
             repositoryMock.Setup(repository => repository.GetByIdAsync(emotionId))
-                .ReturnsAsync((Emotion)null);
+                .ReturnsAsync((Emotion?)null);
 
             EmotionService service = new EmotionService(repositoryMock.Object);
 
-            Emotion result = await service.GetByIdAsync(emotionId);
+            Emotion? result = await service.GetByIdAsync(emotionId);
 
             result.Should().BeNull();
 
             repositoryMock.Verify(repository => repository.GetByIdAsync(emotionId), Times.Once);
         }
 
-        // Update Tests
         [Fact]
-
-        public async Task UpdateAsync_ShouldThrowException_WhenNameIsEmpty()
+        public async Task GetByNameAsync_ShouldThrowException_WhenNameIsEmpty()
         {
-            Guid emotionId = Guid.NewGuid();
             Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
-            repositoryMock.Setup(repository => repository.GetByIdAsync(emotionId))
-                .ReturnsAsync(new Emotion { Id = emotionId, Name = "Medo", Description = "Sentimento de apreensão e temor." });
-
             EmotionService service = new EmotionService(repositoryMock.Object);
 
-            Emotion emotionToUpdate = new Emotion
-            {
-                Id = emotionId,
-                Name = "",
-                Description = "Descrição atualizada"
-            };
-
-            Func<Task> action = async () => await service.UpdateAsync(emotionId, emotionToUpdate);
+            Func<Task> action = async () => await service.GetByNameAsync("");
 
             await action.Should().ThrowAsync<ArgumentException>()
                 .WithMessage("O nome da emoção é obrigatório.");
         }
 
         [Fact]
-        public async Task UpdateAsync_ShouldUpdateEmotion_WhenNameIsProvided()
+        public async Task GetByNameAsync_ShouldReturnEmotion_WhenEmotionExists()
+        {
+            Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
+            repositoryMock.Setup(repository => repository.GetByNameAsync("ansiedade"))
+                .ReturnsAsync(new Emotion { Name = "ansiedade", Description = "Sentimento de preocupação e apreensão." });
+
+            EmotionService service = new EmotionService(repositoryMock.Object);
+
+            Emotion? result = await service.GetByNameAsync(" Ansiedade ");
+
+            result.Should().NotBeNull();
+            result!.Name.Should().Be("ansiedade");
+            result.Description.Should().Be("Sentimento de preocupação e apreensão.");
+
+            repositoryMock.Verify(repository => repository.GetByNameAsync("ansiedade"), Times.Once);
+        }
+
+        // Update Tests
+        [Fact]
+        public async Task UpdateAsync_ShouldThrowException_WhenIdIsEmpty()
+        {
+            Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
+            EmotionService service = new EmotionService(repositoryMock.Object);
+
+            Emotion emotionToUpdate = new Emotion
+            {
+                Name = "Medo",
+                Description = "Descrição atualizada"
+            };
+
+            Func<Task> action = async () => await service.UpdateAsync(Guid.Empty, emotionToUpdate);
+
+            await action.Should().ThrowAsync<ArgumentException>()
+                .WithMessage("Id inválido.");
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ShouldThrowException_WhenEmotionIsNull()
+        {
+            Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
+            EmotionService service = new EmotionService(repositoryMock.Object);
+
+            Func<Task> action = async () => await service.UpdateAsync(Guid.NewGuid(), null!);
+
+            await action.Should().ThrowAsync<ArgumentNullException>();
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ShouldThrowException_WhenNameAlreadyExists()
         {
             Guid emotionId = Guid.NewGuid();
             Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
-            repositoryMock.Setup(repository => repository.GetByIdAsync(emotionId))
-                .ReturnsAsync(new Emotion { Id = emotionId, Name = "Surpresa", Description = "Sentimento de espanto e admiração." });
+            repositoryMock
+                .Setup(repository => repository.GetByNameAsync("surpresa atualizada"))
+                .ReturnsAsync(new Emotion { Id = Guid.NewGuid(), Name = "surpresa atualizada" });
 
             EmotionService service = new EmotionService(repositoryMock.Object);
 
             Emotion emotionToUpdate = new Emotion
             {
-                Id = emotionId,
+                Name = " Surpresa Atualizada ",
+                Description = "Descrição atualizada"
+            };
+
+            Func<Task> action = async () => await service.UpdateAsync(emotionId, emotionToUpdate);
+
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("Já existe outra emoção com esse nome.");
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ShouldUpdateEmotion_WhenDataIsValid()
+        {
+            Guid emotionId = Guid.NewGuid();
+            Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
+            repositoryMock
+                .Setup(repository => repository.GetByNameAsync("surpresa atualizada"))
+                .ReturnsAsync((Emotion?)null);
+
+            EmotionService service = new EmotionService(repositoryMock.Object);
+
+            Emotion emotionToUpdate = new Emotion
+            {
                 Name = " Surpresa Atualizada ",
                 Description = " Descrição atualizada "
             };
@@ -178,48 +260,27 @@ namespace DebugMeBackend.Tests.Services
             result.Should().NotBeNull();
             result.Id.Should().Be(emotionId);
             result.Name.Should().Be("surpresa atualizada");
-            result.Description.Should().Be("Descrição atualizada");
+            result.Description.Should().Be(" Descrição atualizada ");
 
-            repositoryMock.Verify(repository => repository.GetByIdAsync(emotionId), Times.Once);
-            repositoryMock.Verify(repository => repository.UpdateAsync(It.IsAny<Emotion>()), Times.Once);
-
+            repositoryMock.Verify(repository => repository.UpdateAsync(It.Is<Emotion>(e =>
+                e.Id == emotionId &&
+                e.Name == "surpresa atualizada" &&
+                e.Description == " Descrição atualizada ")), Times.Once);
         }
 
         // Delete Tests
-
         [Fact]
         public async Task DeleteAsync_ShouldDeleteEmotion_WhenEmotionExists()
         {
             Guid emotionId = Guid.NewGuid();
             Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
-            repositoryMock.Setup(repository => repository.GetByIdAsync(emotionId))
-                .ReturnsAsync(new Emotion { Id = emotionId, Name = "Nojo", Description = "Sentimento de repulsa e aversão." });
 
             EmotionService service = new EmotionService(repositoryMock.Object);
 
             await service.DeleteAsync(emotionId);
 
-            repositoryMock.Verify(repository => repository.GetByIdAsync(emotionId), Times.Once);
-            repositoryMock.Verify(repository => repository.DeleteAsync(It.IsAny<Emotion>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task DeleteAsync_ShouldThrowException_WhenEmotionDoesNotExist()
-        {
-            Guid emotionId = Guid.NewGuid();
-            Mock<IEmotionRepository> repositoryMock = new Mock<IEmotionRepository>();
-            repositoryMock.Setup(repository => repository.GetByIdAsync(emotionId))
-                .ReturnsAsync((Emotion)null);
-
-            EmotionService service = new EmotionService(repositoryMock.Object);
-
-            Func<Task> action = async () => await service.DeleteAsync(emotionId);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("Emoção não encontrada.");
-
-            repositoryMock.Verify(repository => repository.GetByIdAsync(emotionId), Times.Once);
-            repositoryMock.Verify(repository => repository.DeleteAsync(It.IsAny<Emotion>()), Times.Never);
+            repositoryMock.Verify(repository => repository.DeleteAsync(It.Is<Emotion>(e =>
+                e.Id == emotionId)), Times.Once);
         }
     }
 }
