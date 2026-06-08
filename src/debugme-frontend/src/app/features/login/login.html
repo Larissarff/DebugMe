@@ -3,6 +3,10 @@
     <h1>DebugMe</h1>
     <p class="subtitle">Seu espaço para registrar e entender suas emoções</p>
 
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="email">E-mail</label>
@@ -11,6 +15,7 @@
           type="email"
           formControlName="email"
           placeholder="seuemail@exemplo.com"
+          [class.input-error]="submitted && email?.invalid"
         />
 
         <small class="error" *ngIf="submitted && email?.errors?.['required']">
@@ -29,6 +34,7 @@
           type="password"
           formControlName="password"
           placeholder="Digite sua senha"
+          [class.input-error]="submitted && password?.invalid"
         />
 
         <small class="error" *ngIf="submitted && password?.errors?.['required']">
@@ -40,8 +46,17 @@
         </small>
       </div>
 
-      <button type="submit">Entrar</button>
+      <button type="submit" [disabled]="loading">
+        <span *ngIf="loading" class="spinner"></span>
+        <span *ngIf="!loading">Entrar</span>
+        <span *ngIf="loading">Entrando...</span>
+      </button>
     </form>
+
+    <p class="register-link">
+      Não tem conta?
+      <a routerLink="/register">Cadastre-se</a>
+    </p>
 
     <p class="footer-text">
       Acolhimento, clareza e autoconsciência em um só lugar

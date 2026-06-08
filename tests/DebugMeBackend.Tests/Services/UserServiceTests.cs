@@ -239,7 +239,7 @@ namespace DebugMeBackend.Tests.Services
         // LOGIN TESTS
 
         [Fact]
-        public async Task LoginAsync_ShouldReturnTrue_WhenPasswordIsCorrect()
+        public async Task LoginAsync_ShouldReturnUser_WhenPasswordIsCorrect()
         {
             LoginUserDto dto = new LoginUserDto
             {
@@ -248,10 +248,11 @@ namespace DebugMeBackend.Tests.Services
             };
 
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword("123456");
+            Guid userId = Guid.NewGuid();
 
             User user = new User
             {
-                Id = Guid.NewGuid(),
+                Id = userId,
                 Name = "Larissa",
                 Email = "larissa@email.com",
                 PasswordHash = hashedPassword,
@@ -266,15 +267,18 @@ namespace DebugMeBackend.Tests.Services
 
             UserService userService = new UserService(userRepositoryMock.Object);
 
-            bool result = await userService.LoginAsync(dto);
+            UserResponseDto? result = await userService.LoginAsync(dto);
 
-            result.Should().BeTrue();
+            result.Should().NotBeNull();
+            result!.Id.Should().Be(userId);
+            result.Name.Should().Be("Larissa");
+            result.Email.Should().Be("larissa@email.com");
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
         }
 
         [Fact]
-        public async Task LoginAsync_ShouldReturnFalse_WhenPasswordIsIncorrect()
+        public async Task LoginAsync_ShouldReturnNull_WhenPasswordIsIncorrect()
         {
             LoginUserDto dto = new LoginUserDto
             {
@@ -301,15 +305,15 @@ namespace DebugMeBackend.Tests.Services
 
             UserService userService = new UserService(userRepositoryMock.Object);
 
-            bool result = await userService.LoginAsync(dto);
+            UserResponseDto? result = await userService.LoginAsync(dto);
 
-            result.Should().BeFalse();
+            result.Should().BeNull();
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
         }
 
         [Fact]
-        public async Task LoginAsync_ShouldReturnFalse_WhenUserDoesNotExist()
+        public async Task LoginAsync_ShouldReturnNull_WhenUserDoesNotExist()
         {
             LoginUserDto dto = new LoginUserDto
             {
@@ -325,9 +329,9 @@ namespace DebugMeBackend.Tests.Services
 
             UserService userService = new UserService(userRepositoryMock.Object);
 
-            bool result = await userService.LoginAsync(dto);
+            UserResponseDto? result = await userService.LoginAsync(dto);
 
-            result.Should().BeFalse();
+            result.Should().BeNull();
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
         }

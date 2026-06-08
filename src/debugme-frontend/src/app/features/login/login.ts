@@ -1,18 +1,26 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class Login {
   loginForm: FormGroup;
   submitted: boolean = false;
+  loading: boolean = false;
+  errorMessage: string = '';
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
@@ -21,13 +29,23 @@ export class Login {
 
   onSubmit(): void {
     this.submitted = true;
+    this.errorMessage = '';
 
     if (this.loginForm.invalid) {
       return;
     }
 
-    console.log('Login mock enviado:', this.loginForm.value);
-    alert('Login visual enviado com sucesso. Ainda sem integração com backend.');
+    this.loading = true;
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: () => {
+        this.router.navigate(['/home']);
+      },
+      error: (error: Error) => {
+        this.errorMessage = error.message;
+        this.loading = false;
+      }
+    });
   }
 
   get email() {
