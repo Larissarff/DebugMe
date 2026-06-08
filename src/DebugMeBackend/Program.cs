@@ -1,4 +1,5 @@
 using DebugMeBackend.Data;
+using DebugMeBackend.HealthChecks;
 using DebugMeBackend.Repositories;
 using DebugMeBackend.Repositories.Interfaces;
 using DebugMeBackend.Services;
@@ -32,6 +33,9 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<EmotionService>();
 builder.Services.AddScoped<EventLogService>();
 
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database");
+
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -47,5 +51,29 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            status = report.Status.ToString(),
+            duration = report.TotalDuration.ToString(),
+            timestamp = DateTime.UtcNow,
+            entries = report.Entries.ToDictionary(
+                e => e.Key,
+                e => new
+                {
+                    status = e.Value.Status.ToString(),
+                    description = e.Value.Description,
+                    duration = e.Value.Duration.ToString()
+                })
+        };
+
+        await context.Response.WriteAsJsonAsync(response);
+    }
+});
 
 app.Run();
