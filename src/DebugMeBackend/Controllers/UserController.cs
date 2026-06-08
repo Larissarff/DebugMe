@@ -40,21 +40,21 @@ namespace DebugMeBackend.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] LoginUserDto dto)
+        public async Task<ActionResult<UserResponseDto>> Login([FromBody] LoginUserDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
 
-            bool success = await _userService.LoginAsync(dto);
+            UserResponseDto? user = await _userService.LoginAsync(dto);
 
-            if (!success)
+            if (user is null)
             {
                 return Unauthorized(new { message = "E-mail ou senha inválidos." });
             }
 
-            return Ok(new { message = "Login realizado com sucesso." });
+            return Ok(user);
         }
 
         [HttpGet("all")]

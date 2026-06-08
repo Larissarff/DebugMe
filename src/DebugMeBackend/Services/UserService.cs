@@ -59,7 +59,7 @@ namespace DebugMeBackend.Services
             return response;
         }
 
-        public async Task<bool> LoginAsync(LoginUserDto dto)
+        public async Task<UserResponseDto?> LoginAsync(LoginUserDto dto)
         {
             string normalizedEmail = dto.Email.Trim().ToLower();
 
@@ -67,10 +67,17 @@ namespace DebugMeBackend.Services
 
             if (user is null)
             {
-                return false;
+                return null;
             }
 
-            return BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+            bool passwordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+
+            if (!passwordValid)
+            {
+                return null;
+            }
+
+            return MapToResponse(user);
         }
 
         public async Task<UserResponseDto?> UpdateAsync(Guid id, UpdateUserDto dto)
