@@ -46,6 +46,46 @@ namespace DebugMeBackend.Tests.Services
         }
 
         [Fact]
+        public async Task CreateAsync_ShouldHashPasswordWithBCrypt()
+        {
+            CreateUserDto dto = new CreateUserDto
+            {
+                Name = "Larissa",
+                Email = "larissa@email.com",
+                Password = "123456"
+            };
+
+            User? capturedUser = null;
+
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+
+            userRepositoryMock
+                .Setup(repository => repository.GetByEmailAsync(dto.Email))
+                .ReturnsAsync((User?)null);
+
+            userRepositoryMock
+                .Setup(repository => repository.AddAsync(It.IsAny<User>()))
+                .Callback<User>(user => capturedUser = user)
+                .Returns(Task.CompletedTask);
+
+            UserService userService = new UserService(userRepositoryMock.Object);
+
+            UserResponseDto result = await userService.CreateAsync(dto);
+
+            result.Should().NotBeNull();
+
+            // Verifica que o hash foi gerado pelo BCrypt (começa com $2a$, $2b$ ou $2y$)
+            capturedUser.Should().NotBeNull();
+            capturedUser!.PasswordHash.Should().StartWith("$2");
+
+            // Verifica que a senha original pode ser verificada com o hash
+            BCrypt.Net.BCrypt.Verify(dto.Password, capturedUser.PasswordHash).Should().BeTrue();
+
+            userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
+            userRepositoryMock.Verify(repository => repository.AddAsync(It.IsAny<User>()), Times.Once);
+        }
+
+        [Fact]
         public async Task CreateAsync_ShouldThrowInvalidOperationException_WhenEmailAlreadyExists()
         {
             CreateUserDto dto = new CreateUserDto
@@ -74,14 +114,14 @@ namespace DebugMeBackend.Tests.Services
             CreateUserDto dto = new CreateUserDto
             {
                 Name = "Larissa",
-                Email = "larissa@email.com",
+                Email = "  Larissa@Email.com  ",
                 Password = "123456"
             };
 
             Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
 
             userRepositoryMock
-                .Setup(repository => repository.GetByEmailAsync(dto.Email))
+                .Setup(repository => repository.GetByEmailAsync("larissa@email.com"))
                 .ReturnsAsync((User?)null);
 
             userRepositoryMock
@@ -98,7 +138,7 @@ namespace DebugMeBackend.Tests.Services
             result.Id.Should().NotBeEmpty();
             result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
-            userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
+            userRepositoryMock.Verify(repository => repository.GetByEmailAsync("larissa@email.com"), Times.Once);
             userRepositoryMock.Verify(repository => repository.AddAsync(It.IsAny<User>()), Times.Once);
         }
 
@@ -194,6 +234,102 @@ namespace DebugMeBackend.Tests.Services
             result.Should().BeNull();
 
             userRepositoryMock.Verify(repository => repository.GetByIdAsync(userId), Times.Once);
+        }
+
+        // LOGIN TESTS
+
+        [Fact]
+        public async Task LoginAsync_ShouldReturnTrue_WhenPasswordIsCorrect()
+        {
+            LoginUserDto dto = new LoginUserDto
+            {
+                Email = "larissa@email.com",
+                Password = "123456"
+            };
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword("123456");
+
+            User user = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = "Larissa",
+                Email = "larissa@email.com",
+                PasswordHash = hashedPassword,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+
+            userRepositoryMock
+                .Setup(repository => repository.GetByEmailAsync(dto.Email))
+                .ReturnsAsync(user);
+
+            UserService userService = new UserService(userRepositoryMock.Object);
+
+            bool result = await userService.LoginAsync(dto);
+
+            result.Should().BeTrue();
+
+            userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
+        }
+
+        [Fact]
+        public async Task LoginAsync_ShouldReturnFalse_WhenPasswordIsIncorrect()
+        {
+            LoginUserDto dto = new LoginUserDto
+            {
+                Email = "larissa@email.com",
+                Password = "wrongpassword"
+            };
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword("123456");
+
+            User user = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = "Larissa",
+                Email = "larissa@email.com",
+                PasswordHash = hashedPassword,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+
+            userRepositoryMock
+                .Setup(repository => repository.GetByEmailAsync(dto.Email))
+                .ReturnsAsync(user);
+
+            UserService userService = new UserService(userRepositoryMock.Object);
+
+            bool result = await userService.LoginAsync(dto);
+
+            result.Should().BeFalse();
+
+            userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
+        }
+
+        [Fact]
+        public async Task LoginAsync_ShouldReturnFalse_WhenUserDoesNotExist()
+        {
+            LoginUserDto dto = new LoginUserDto
+            {
+                Email = "nonexistent@email.com",
+                Password = "123456"
+            };
+
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+
+            userRepositoryMock
+                .Setup(repository => repository.GetByEmailAsync(dto.Email))
+                .ReturnsAsync((User?)null);
+
+            UserService userService = new UserService(userRepositoryMock.Object);
+
+            bool result = await userService.LoginAsync(dto);
+
+            result.Should().BeFalse();
+
+            userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
         }
 
         // PUT TESTS

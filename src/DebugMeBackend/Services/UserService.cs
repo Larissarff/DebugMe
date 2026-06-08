@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using DebugMeBackend.DTOs.User;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Repositories.Interfaces;
@@ -30,7 +28,7 @@ namespace DebugMeBackend.Services
             {
                 Name = dto.Name.Trim(),
                 Email = normalizedEmail,
-                PasswordHash = HashPassword(dto.Password)
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
             };
 
             await _userRepository.AddAsync(user);
@@ -72,9 +70,7 @@ namespace DebugMeBackend.Services
                 return false;
             }
 
-            string passwordHash = HashPassword(dto.Password);
-
-            return user.PasswordHash == passwordHash;
+            return BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
         }
 
         public async Task<UserResponseDto?> UpdateAsync(Guid id, UpdateUserDto dto)
@@ -128,16 +124,6 @@ namespace DebugMeBackend.Services
             };
 
             return response;
-        }
-
-        private static string HashPassword(string password)
-        {
-            using SHA256 sha256 = SHA256.Create();
-            byte[] bytes = Encoding.UTF8.GetBytes(password);
-            byte[] hash = sha256.ComputeHash(bytes);
-            string passwordHash = Convert.ToBase64String(hash);
-
-            return passwordHash;
         }
     }
 }
