@@ -1,3 +1,4 @@
+using DebugMeBackend.DTOs.EventLog;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,28 +17,32 @@ public class EventLogController : ControllerBase
     }
 
     [HttpGet("all")]
-    public async Task<ActionResult<IEnumerable<EventLog>>> GetAll()
+    public async Task<ActionResult<IEnumerable<EventLogResponseDto>>> GetAll()
     {
         IEnumerable<EventLog> eventLogs = await _eventLogService.GetAllAsync();
-        return Ok(eventLogs);
+        IEnumerable<EventLogResponseDto> dtos = eventLogs.Select(MapToDto);
+        return Ok(dtos);
     }
 
     [HttpGet("id/{id:guid}")]
-    public async Task<ActionResult<EventLog>> GetById(Guid id)
+    public async Task<ActionResult<EventLogResponseDto>> GetById(Guid id)
     {
         EventLog? eventLog = await _eventLogService.GetByIdAsync(id);
-        return Ok(eventLog);
+        if (eventLog is null)
+            return NotFound(new { message = "Registro não encontrado." });
+        return Ok(MapToDto(eventLog));
     }
 
     [HttpGet("user/{userId:guid}")]
-    public async Task<ActionResult<IEnumerable<EventLog>>> GetByUserId(Guid userId)
+    public async Task<ActionResult<IEnumerable<EventLogResponseDto>>> GetByUserId(Guid userId)
     {
         IEnumerable<EventLog> eventLogs = await _eventLogService.GetByUserIdAsync(userId);
-        return Ok(eventLogs);
+        IEnumerable<EventLogResponseDto> dtos = eventLogs.Select(MapToDto);
+        return Ok(dtos);
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult<EventLog>> Create([FromBody] EventLog eventLog)
+    public async Task<ActionResult<EventLogResponseDto>> Create([FromBody] EventLog eventLog)
     {
         if (!ModelState.IsValid)
         {
@@ -47,11 +52,12 @@ public class EventLogController : ControllerBase
         try
         {
             EventLog createdEventLog = await _eventLogService.CreateAsync(eventLog);
+            EventLogResponseDto dto = MapToDto(createdEventLog);
 
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = createdEventLog.Id },
-                createdEventLog
+                dto
             );
         }
         catch (InvalidOperationException ex)
@@ -61,7 +67,7 @@ public class EventLogController : ControllerBase
     }
 
     [HttpPut("update/{id:guid}")]
-    public async Task<ActionResult<EventLog>> Update(Guid id, [FromBody] EventLog eventLog)
+    public async Task<ActionResult<EventLogResponseDto>> Update(Guid id, [FromBody] EventLog eventLog)
     {
         if (!ModelState.IsValid)
         {
@@ -71,7 +77,7 @@ public class EventLogController : ControllerBase
         try
         {
             EventLog updatedEventLog = await _eventLogService.UpdateAsync(id, eventLog);
-            return Ok(updatedEventLog);
+            return Ok(MapToDto(updatedEventLog));
         }
         catch (InvalidOperationException ex)
         {
@@ -88,5 +94,36 @@ public class EventLogController : ControllerBase
     {
         await _eventLogService.DeleteAsync(id);
         return NoContent();
+    }
+
+    private static EventLogResponseDto MapToDto(EventLog eventLog)
+    {
+        return new EventLogResponseDto
+        {
+            Id = eventLog.Id,
+            UserId = eventLog.UserId,
+            EmotionId = eventLog.EmotionId,
+            Description = eventLog.Description,
+            Intensity = eventLog.Intensity,
+            EventDate = eventLog.EventDate,
+            CreatedAt = eventLog.CreatedAt,
+            UpdatedAt = eventLog.UpdatedAt,
+            Emotion = eventLog.Emotion is not null
+                ? new EmotionInfoDto
+                {
+                    Id = eventLog.Emotion.Id,
+                    Name = eventLog.Emotion.Name,
+                    Description = eventLog.Emotion.Description
+                }
+                : null,
+            User = eventLog.User is not null
+                ? new UserInfoDto
+                {
+                    Id = eventLog.User.Id,
+                    Name = eventLog.User.Name,
+                    Email = eventLog.User.Email
+                }
+                : null
+        };
     }
 }

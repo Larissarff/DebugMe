@@ -1,6 +1,6 @@
-/* === Login Page — Design Terapêutico === */
+/* === Register Page — Design Terapêutico === */
 
-.login-page {
+.register-page {
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -31,7 +31,7 @@
   height: 450px;
   background: radial-gradient(circle, #c4b5fd, #a78bfa);
   top: -150px;
-  right: -100px;
+  left: -100px;
 }
 
 .blob-2 {
@@ -39,7 +39,7 @@
   height: 350px;
   background: radial-gradient(circle, #f0abfc, #e879f9);
   bottom: -100px;
-  left: -80px;
+  right: -80px;
   animation-delay: -5s;
 }
 
@@ -47,8 +47,8 @@
   width: 200px;
   height: 200px;
   background: radial-gradient(circle, #99f6e4, #5eead4);
-  top: 60%;
-  right: 10%;
+  top: 30%;
+  left: 60%;
   animation-delay: -10s;
   opacity: 0.12;
 }
@@ -60,11 +60,11 @@
 }
 
 /* ── Card ── */
-.login-card {
+.register-card {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -93,7 +93,7 @@
   50% { transform: translateY(-6px); }
 }
 
-.login-card h1 {
+.register-card h1 {
   margin: 0 0 8px 0;
   font-size: 32px;
   font-weight: 800;
@@ -108,7 +108,6 @@
   margin: 0;
   color: #6b5b8a;
   font-size: 14px;
-  line-height: 1.5;
   font-weight: 400;
 }
 
@@ -129,7 +128,7 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
@@ -243,29 +242,21 @@
 }
 
 /* ── Links ── */
-.register-link {
+.login-link {
   margin-top: 24px;
   text-align: center;
   color: #6b5b8a;
   font-size: 14px;
 }
 
-.register-link a {
+.login-link a {
   color: #8b5cf6;
   font-weight: 700;
   text-decoration: none;
 }
 
-.register-link a:hover {
+.login-link a:hover {
   text-decoration: underline;
-}
-
-.footer-text {
-  margin-top: 20px;
-  text-align: center;
-  color: #a89bc2;
-  font-size: 13px;
-  font-style: italic;
 }
 
 @keyframes fadeInUp {
@@ -281,12 +272,12 @@
 
 /* ── Responsivo ── */
 @media (max-width: 600px) {
-  .login-card {
+  .register-card {
     padding: 28px 22px;
     border-radius: 24px;
   }
 
-  .login-card h1 {
+  .register-card h1 {
     font-size: 28px;
   }
 }
