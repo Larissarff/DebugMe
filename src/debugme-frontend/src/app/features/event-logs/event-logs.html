@@ -1,2 +1,70 @@
-<h2>Event Logs</h2>
-<p>Os registros emocionais serão exibidos aqui.</p>
+<div class="list-page">
+  <!-- Background decoration -->
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="list-header">
+    <div class="header-content">
+      <div class="header-left">
+        <a routerLink="/home" class="back-link">← Voltar ao início</a>
+        <h1>Meus Registros</h1>
+        <p class="header-subtitle">Sua jornada emocional em um só lugar</p>
+      </div>
+      <a routerLink="/events/new" class="btn-new">
+        <span class="btn-new-icon">+</span>
+        Novo registro
+      </a>
+    </div>
+  </header>
+
+  <main class="list-content">
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="loading">
+      <span class="spinner"></span>
+      <span>Carregando seus registros...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && eventLogs.length === 0">
+      <div class="empty-icon">🌱</div>
+      <h3>Nenhum registro ainda</h3>
+      <p>Você ainda não registrou nenhum momento emocional.<br>Que tal começar agora?</p>
+      <a routerLink="/events/new" class="btn-empty">Criar primeiro registro</a>
+    </div>
+
+    <!-- Event List -->
+    <div class="event-list" *ngIf="!loading && eventLogs.length > 0">
+      <div class="event-card" *ngFor="let log of eventLogs">
+        <div class="card-glow"></div>
+        <div class="card-main">
+          <div class="card-top-row">
+            <span class="emotion-badge">{{ getEmotionName(log) }}</span>
+            <span class="event-date">{{ formatDate(log.eventDate || log.createdAt) }}</span>
+          </div>
+          <p class="event-description">{{ truncate(log.description) }}</p>
+          <div class="card-footer">
+            <div class="intensity-bar">
+              <div class="intensity-fill" [style.width.%]="log.intensity * 10" [style.background]="getIntensityColor(log.intensity)"></div>
+            </div>
+            <span class="intensity-text">Intensidade: {{ log.intensity }}/10</span>
+          </div>
+        </div>
+        <button
+          class="btn-delete"
+          (click)="confirmDelete(log.id)"
+          [disabled]="deletingId === log.id"
+          title="Excluir registro"
+        >
+          🗑️
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

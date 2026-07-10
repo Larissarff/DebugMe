@@ -4,6 +4,7 @@ import { ApiService } from './api.service';
 import { EventLog } from '../models/event-log.model';
 
 export interface CreateEventLogRequest {
+  userId: string;
   emotionId: string;
   intensity: number;
   description: string;
@@ -21,7 +22,7 @@ export class EventLogService {
   }
 
   getById(id: string): Observable<EventLog> {
-    return this.api.get<EventLog>(`/api/eventlog/${id}`);
+    return this.api.get<EventLog>(`/api/eventlog/id/${id}`);
   }
 
   create(data: CreateEventLogRequest): Observable<EventLog> {
@@ -29,6 +30,6 @@ export class EventLogService {
   }
 
   delete(id: string): Observable<void> {
-    return this.api.delete<void>(`/api/eventlog/${id}`);
+    return this.api.delete<void>(`/api/eventlog/delete/${id}`);
   }
 }

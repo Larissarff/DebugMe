@@ -1,0 +1,113 @@
+<div class="manage-page">
+  <!-- Background decoration -->
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="manage-header">
+    <div class="header-content">
+      <div class="header-left">
+        <a routerLink="/home" class="back-link">← Voltar ao início</a>
+        <h1>Gerenciar Emoções</h1>
+        <p class="header-subtitle">Cadastre e visualize os tipos de emoção disponíveis</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="manage-content">
+    <!-- Error global -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="loading">
+      <span class="spinner"></span>
+      <span>Carregando emoções...</span>
+    </div>
+
+    <div class="manage-layout" *ngIf="!loading">
+      <!-- Coluna da esquerda: Formulário -->
+      <section class="form-section">
+        <div class="form-card">
+          <h2>Nova Emoção</h2>
+          <p class="form-subtitle">Adicione um novo tipo de emoção para usar nos registros</p>
+
+          <div class="form-success" *ngIf="formSuccess">
+            {{ formSuccess }}
+          </div>
+          <div class="form-error" *ngIf="formError">
+            {{ formError }}
+          </div>
+
+          <form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+              <label for="name">Nome da emoção *</label>
+              <div class="input-wrapper">
+                <span class="input-icon">💜</span>
+                <input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  placeholder="Ex: Gratidão, Ansiedade, Alegria..."
+                  [class.input-error]="formSubmitted && name?.invalid"
+                />
+              </div>
+              <small class="error" *ngIf="formSubmitted && name?.errors?.['required']">
+                O nome da emoção é obrigatório.
+              </small>
+              <small class="error" *ngIf="formSubmitted && name?.errors?.['minlength']">
+                O nome deve ter pelo menos 2 caracteres.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Descrição (opcional)</label>
+              <textarea
+                id="description"
+                formControlName="description"
+                placeholder="Uma breve descrição para ajudar a identificar essa emoção..."
+                maxlength="200"
+                rows="3"
+              ></textarea>
+              <div class="char-counter">
+                {{ description?.value?.length || 0 }}/200
+              </div>
+            </div>
+
+            <button type="submit" [disabled]="formLoading" class="btn-submit">
+              <span *ngIf="formLoading" class="spinner"></span>
+              <span *ngIf="!formLoading">✦ Cadastrar emoção</span>
+              <span *ngIf="formLoading">Cadastrando...</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Coluna da direita: Lista -->
+      <section class="list-section">
+        <div class="list-card">
+          <h2>Emoções Cadastradas</h2>
+          <p class="list-subtitle">{{ emotions.length }} emoção(ões) disponível(is)</p>
+
+          <div class="empty-emotions" *ngIf="emotions.length === 0">
+            <div class="empty-icon">🌿</div>
+            <p>Nenhuma emoção cadastrada ainda.<br>Use o formulário ao lado para adicionar.</p>
+          </div>
+
+          <div class="emotion-list" *ngIf="emotions.length > 0">
+            <div class="emotion-item" *ngFor="let emotion of emotions">
+              <div class="emotion-info">
+                <span class="emotion-name">{{ emotion.name }}</span>
+                <span class="emotion-desc" *ngIf="emotion.description">{{ emotion.description }}</span>
+              </div>
+              <span class="emotion-id">#{{ emotion.id | slice:0:8 }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

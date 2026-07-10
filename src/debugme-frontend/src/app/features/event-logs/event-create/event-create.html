@@ -1,0 +1,118 @@
+<div class="create-page">
+  <!-- Background decoration -->
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <div class="create-card">
+    <div class="card-header">
+      <a routerLink="/home" class="back-link">← Voltar ao início</a>
+      <h1>Novo Registro</h1>
+      <p class="subtitle">Registre um momento emocional marcante ou relevante</p>
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="loading-emotions" *ngIf="loadingEmotions">
+      <span class="spinner"></span>
+      <span>Preparando suas emoções...</span>
+    </div>
+
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" *ngIf="!loadingEmotions">
+      <!-- Emoção -->
+      <div class="form-group">
+        <label for="emotionId">Como você está se sentindo? *</label>
+        <div class="select-wrapper">
+          <select
+            id="emotionId"
+            formControlName="emotionId"
+            [class.input-error]="submitted && emotionId?.invalid"
+          >
+            <option value="">Selecione uma emoção</option>
+            <option *ngFor="let emotion of emotions" [value]="emotion.id">
+              {{ emotion.name }}
+            </option>
+          </select>
+          <span class="select-arrow">▼</span>
+        </div>
+        <small class="error" *ngIf="submitted && emotionId?.errors?.['required']">
+          Selecione a emoção que melhor descreve seu momento.
+        </small>
+      </div>
+
+      <!-- Intensidade -->
+      <div class="form-group">
+        <label>Intensidade: <strong>{{ eventForm.get('intensity')?.value || 5 }}</strong></label>
+        <div class="intensity-wrapper">
+          <span class="intensity-label intensity-low">Suave</span>
+          <input
+            id="intensity"
+            type="range"
+            formControlName="intensity"
+            min="1"
+            max="10"
+            class="intensity-slider"
+          />
+          <span class="intensity-label intensity-high">Intenso</span>
+        </div>
+        <div class="intensity-legend">
+          <span>1</span>
+          <span>2</span>
+          <span>3</span>
+          <span>4</span>
+          <span>5</span>
+          <span>6</span>
+          <span>7</span>
+          <span>8</span>
+          <span>9</span>
+          <span>10</span>
+        </div>
+      </div>
+
+      <!-- Descrição -->
+      <div class="form-group">
+        <label for="description">Descreva esse momento</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          placeholder="O que aconteceu? Como você se sentiu? Compartilhe o que for confortável para você..."
+          maxlength="500"
+          rows="4"
+          [class.input-error]="submitted && description?.invalid"
+        ></textarea>
+        <div class="char-counter" [class.char-warning]="(description?.value?.length || 0) > 400">
+          {{ description?.value?.length || 0 }}/500
+        </div>
+        <small class="error" *ngIf="submitted && description?.errors?.['maxlength']">
+          A descrição deve ter no máximo 500 caracteres.
+        </small>
+      </div>
+
+      <!-- Data -->
+      <div class="form-group">
+        <label for="eventDate">Quando aconteceu? *</label>
+        <div class="date-wrapper">
+          <span class="date-icon">📅</span>
+          <input
+            id="eventDate"
+            type="date"
+            formControlName="eventDate"
+            [class.input-error]="submitted && eventDate?.invalid"
+          />
+        </div>
+        <small class="error" *ngIf="submitted && eventDate?.errors?.['required']">
+          Informe a data do momento que deseja registrar.
+        </small>
+      </div>
+
+      <button type="submit" [disabled]="loading" class="btn-submit">
+        <span *ngIf="loading" class="spinner"></span>
+        <span *ngIf="!loading">✦ Salvar registro</span>
+        <span *ngIf="loading">Salvando...</span>
+      </button>
+    </form>
+  </div>
+</div>

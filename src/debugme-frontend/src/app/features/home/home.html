@@ -1,2 +1,75 @@
-<h2>Home</h2>
-<p>Bem-vinda ao DebugMe.</p>
+<div class="home-page">
+  <!-- Background decoration -->
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="home-header">
+    <div class="header-content">
+      <h1 class="app-title">DebugMe</h1>
+      <div class="header-right">
+        <span class="user-greeting">
+          <span class="greeting-icon">🌸</span>
+          Olá, {{ user?.name || 'Usuário' }}
+        </span>
+        <button class="btn-logout" (click)="logout()">
+          <span class="btn-icon">🌿</span>
+          Sair
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="home-content">
+    <!-- Welcome -->
+    <section class="welcome-section">
+      <div class="welcome-icon">🪷</div>
+      <h2>Bem-vindo ao seu espaço</h2>
+      <p class="welcome-text">
+        Um lugar seguro para registrar, acolher e compreender suas emoções.
+        Cada sentimento merece ser ouvido.
+      </p>
+    </section>
+
+    <!-- Action Cards -->
+    <section class="actions-section">
+      <div class="action-card" routerLink="/events/new">
+        <div class="card-glow"></div>
+        <div class="action-icon-wrapper">
+          <span class="action-icon">📝</span>
+        </div>
+        <h3>Novo Registro</h3>
+        <p>Registre um momento emocional marcante</p>
+        <span class="card-hint">Toque para começar →</span>
+      </div>
+
+      <div class="action-card" routerLink="/events">
+        <div class="card-glow"></div>
+        <div class="action-icon-wrapper">
+          <span class="action-icon">📖</span>
+        </div>
+        <h3>Ver Registros</h3>
+        <p>Revise sua jornada emocional</p>
+        <span class="card-hint">Toque para explorar →</span>
+      </div>
+
+      <div class="action-card" routerLink="/emotions/manage">
+        <div class="card-glow"></div>
+        <div class="action-icon-wrapper">
+          <span class="action-icon">💜</span>
+        </div>
+        <h3>Gerenciar Emoções</h3>
+        <p>Cadastre novos tipos de emoção</p>
+        <span class="card-hint">Toque para gerenciar →</span>
+      </div>
+    </section>
+
+    <!-- Footer quote -->
+    <footer class="home-footer">
+      <p class="footer-quote">"Acolhimento, clareza e autoconsciência em um só lugar"</p>
+    </footer>
+  </main>
+</div>
