@@ -1,4 +1,5 @@
-# DebugMe 🧠🐞 — Mental Debugging as Software
+# DebugMe 🧠🐞 — Mental Debugging as Software 
+### EM DESENVOLVIMENTO
 
 > Mental debugging as a structured engineering process.
 
@@ -78,7 +79,6 @@ O DebugMe aplica conceitos de engenharia de software ao desenvolvimento pessoal:
 - RxJS
 
 ### Infra
-- Docker
 - GitHub
 
 ---
