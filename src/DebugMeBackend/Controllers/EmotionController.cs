@@ -1,11 +1,13 @@
 using DebugMeBackend.Entities;
 using DebugMeBackend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DebugMeBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EmotionController : ControllerBase
     {
         private readonly EmotionService _emotionService;

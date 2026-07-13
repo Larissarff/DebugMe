@@ -1,12 +1,14 @@
 using DebugMeBackend.DTOs.EventLog;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DebugMeBackend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class EventLogController : ControllerBase
 {
     private readonly EventLogService _eventLogService;

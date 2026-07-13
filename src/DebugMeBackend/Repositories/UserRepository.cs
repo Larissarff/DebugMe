@@ -26,6 +26,12 @@ namespace DebugMeBackend.Repositories
             return user;
         }
 
+        public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
+        {
+            User? user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            return user;
+        }
+
         public async Task<List<User>> GetAllAsync()
         {
             List<User> users = await _context.Users.ToListAsync();

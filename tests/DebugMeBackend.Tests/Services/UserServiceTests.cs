@@ -3,12 +3,40 @@ using DebugMeBackend.Entities;
 using DebugMeBackend.Repositories.Interfaces;
 using DebugMeBackend.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace DebugMeBackend.Tests.Services
 {
     public class UserServiceTests
     {
+        private static IConfiguration CreateConfiguration()
+        {
+            Mock<IConfiguration> mock = new Mock<IConfiguration>();
+
+            mock.Setup(c => c["Jwt:Secret"])
+                .Returns("ThisIsASuperSecretKeyForTestingPurposesAtLeast32Chars!");
+            mock.Setup(c => c["Jwt:Issuer"])
+                .Returns("DebugMe");
+            mock.Setup(c => c["Jwt:Audience"])
+                .Returns("DebugMe");
+            mock.Setup(c => c["Jwt:AccessTokenExpiryMinutes"])
+                .Returns("60");
+            mock.Setup(c => c["Jwt:RefreshTokenExpiryDays"])
+                .Returns("7");
+
+            return mock.Object;
+        }
+
+        private static UserService CreateUserService(
+            Mock<IUserRepository>? userRepositoryMock = null,
+            IConfiguration? configuration = null)
+        {
+            return new UserService(
+                (userRepositoryMock ?? new Mock<IUserRepository>()).Object,
+                configuration ?? CreateConfiguration());
+        }
+
         // POST TESTS
 
         [Fact]
@@ -31,15 +59,17 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.AddAsync(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
-            UserResponseDto result = await userService.CreateAsync(dto);
+            TokenResponseDto result = await userService.CreateAsync(dto);
 
             result.Should().NotBeNull();
-            result.Name.Should().Be("Larissa");
-            result.Email.Should().Be("larissa@email.com");
-            result.Id.Should().NotBeEmpty();
-            result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            result.Token.Should().NotBeNullOrEmpty();
+            result.RefreshToken.Should().NotBeNullOrEmpty();
+            result.User.Name.Should().Be("Larissa");
+            result.User.Email.Should().Be("larissa@email.com");
+            result.User.Id.Should().NotBeEmpty();
+            result.User.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
             userRepositoryMock.Verify(repository => repository.AddAsync(It.IsAny<User>()), Times.Once);
@@ -68,17 +98,15 @@ namespace DebugMeBackend.Tests.Services
                 .Callback<User>(user => capturedUser = user)
                 .Returns(Task.CompletedTask);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
-            UserResponseDto result = await userService.CreateAsync(dto);
+            TokenResponseDto result = await userService.CreateAsync(dto);
 
             result.Should().NotBeNull();
 
-            // Verifica que o hash foi gerado pelo BCrypt (começa com $2a$, $2b$ ou $2y$)
             capturedUser.Should().NotBeNull();
             capturedUser!.PasswordHash.Should().StartWith("$2");
 
-            // Verifica que a senha original pode ser verificada com o hash
             BCrypt.Net.BCrypt.Verify(dto.Password, capturedUser.PasswordHash).Should().BeTrue();
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
@@ -101,9 +129,9 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetByEmailAsync(dto.Email))
                 .ReturnsAsync(new User());
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
-            Func<Task<UserResponseDto>> act = () => userService.CreateAsync(dto);
+            Func<Task<TokenResponseDto>> act = () => userService.CreateAsync(dto);
 
             await act.Should().ThrowAsync<InvalidOperationException>();
         }
@@ -128,15 +156,15 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.AddAsync(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
-            UserResponseDto result = await userService.CreateAsync(dto);
+            TokenResponseDto result = await userService.CreateAsync(dto);
 
             result.Should().NotBeNull();
-            result.Name.Should().Be("Larissa");
-            result.Email.Should().Be("larissa@email.com");
-            result.Id.Should().NotBeEmpty();
-            result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            result.User.Name.Should().Be("Larissa");
+            result.User.Email.Should().Be("larissa@email.com");
+            result.User.Id.Should().NotBeEmpty();
+            result.User.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync("larissa@email.com"), Times.Once);
             userRepositoryMock.Verify(repository => repository.AddAsync(It.IsAny<User>()), Times.Once);
@@ -159,7 +187,7 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetAllAsync())
                 .ReturnsAsync(users);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
             List<UserResponseDto> result = await userService.GetAllAsync();
 
@@ -182,7 +210,7 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetAllAsync())
                 .ReturnsAsync(users);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
             List<UserResponseDto> result = await userService.GetAllAsync();
 
@@ -204,7 +232,7 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetByIdAsync(userId))
                 .ReturnsAsync(user);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
             UserResponseDto? result = await userService.GetByIdAsync(userId);
 
@@ -227,7 +255,7 @@ namespace DebugMeBackend.Tests.Services
             .Setup(repository => repository.GetByIdAsync(userId))
             .ReturnsAsync((User?)null);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
             UserResponseDto? result = await userService.GetByIdAsync(userId);
 
@@ -239,7 +267,7 @@ namespace DebugMeBackend.Tests.Services
         // LOGIN TESTS
 
         [Fact]
-        public async Task LoginAsync_ShouldReturnUser_WhenPasswordIsCorrect()
+        public async Task LoginAsync_ShouldReturnToken_WhenPasswordIsCorrect()
         {
             LoginUserDto dto = new LoginUserDto
             {
@@ -265,16 +293,25 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetByEmailAsync(dto.Email))
                 .ReturnsAsync(user);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            userRepositoryMock
+                .Setup(repository => repository.UpdateAsync(It.IsAny<User>()))
+                .Returns(Task.CompletedTask);
 
-            UserResponseDto? result = await userService.LoginAsync(dto);
+            UserService userService = CreateUserService(userRepositoryMock);
+
+            TokenResponseDto? result = await userService.LoginAsync(dto);
 
             result.Should().NotBeNull();
-            result!.Id.Should().Be(userId);
-            result.Name.Should().Be("Larissa");
-            result.Email.Should().Be("larissa@email.com");
+            result!.Token.Should().NotBeNullOrEmpty();
+            result.RefreshToken.Should().NotBeNullOrEmpty();
+            result.ExpiresAt.Should().BeAfter(DateTime.UtcNow);
+            result.User.Should().NotBeNull();
+            result.User.Id.Should().Be(userId);
+            result.User.Name.Should().Be("Larissa");
+            result.User.Email.Should().Be("larissa@email.com");
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
+            userRepositoryMock.Verify(repository => repository.UpdateAsync(It.IsAny<User>()), Times.Once);
         }
 
         [Fact]
@@ -303,9 +340,9 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetByEmailAsync(dto.Email))
                 .ReturnsAsync(user);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
-            UserResponseDto? result = await userService.LoginAsync(dto);
+            TokenResponseDto? result = await userService.LoginAsync(dto);
 
             result.Should().BeNull();
 
@@ -327,20 +364,155 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetByEmailAsync(dto.Email))
                 .ReturnsAsync((User?)null);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
-            UserResponseDto? result = await userService.LoginAsync(dto);
+            TokenResponseDto? result = await userService.LoginAsync(dto);
 
             result.Should().BeNull();
 
             userRepositoryMock.Verify(repository => repository.GetByEmailAsync(dto.Email), Times.Once);
         }
 
+        // REFRESH TOKEN TESTS
+
+        [Fact]
+        public async Task RefreshTokenAsync_ShouldReturnNewTokens_WhenRefreshTokenIsValid()
+        {
+            string oldRefreshToken = "valid-refresh-token";
+            User user = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = "Larissa",
+                Email = "larissa@email.com",
+                CreatedAt = DateTime.UtcNow,
+                RefreshToken = oldRefreshToken,
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(1)
+            };
+
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+
+            userRepositoryMock
+                .Setup(repository => repository.GetByRefreshTokenAsync(oldRefreshToken))
+                .ReturnsAsync(user);
+
+            userRepositoryMock
+                .Setup(repository => repository.UpdateAsync(It.IsAny<User>()))
+                .Returns(Task.CompletedTask);
+
+            UserService userService = CreateUserService(userRepositoryMock);
+
+            TokenResponseDto? result = await userService.RefreshTokenAsync(oldRefreshToken);
+
+            result.Should().NotBeNull();
+            result!.Token.Should().NotBeNullOrEmpty();
+            result.RefreshToken.Should().NotBeNullOrEmpty();
+            result.RefreshToken.Should().NotBe(oldRefreshToken);
+            result.ExpiresAt.Should().BeAfter(DateTime.UtcNow);
+
+            userRepositoryMock.Verify(repository => repository.GetByRefreshTokenAsync(oldRefreshToken), Times.Once);
+            userRepositoryMock.Verify(repository => repository.UpdateAsync(It.IsAny<User>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_ShouldReturnNull_WhenRefreshTokenNotFound()
+        {
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+
+            userRepositoryMock
+                .Setup(repository => repository.GetByRefreshTokenAsync("invalid-token"))
+                .ReturnsAsync((User?)null);
+
+            UserService userService = CreateUserService(userRepositoryMock);
+
+            TokenResponseDto? result = await userService.RefreshTokenAsync("invalid-token");
+
+            result.Should().BeNull();
+
+            userRepositoryMock.Verify(repository => repository.GetByRefreshTokenAsync("invalid-token"), Times.Once);
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_ShouldReturnNull_WhenRefreshTokenIsExpired()
+        {
+            string expiredToken = "expired-refresh-token";
+            User user = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = "Larissa",
+                Email = "larissa@email.com",
+                CreatedAt = DateTime.UtcNow,
+                RefreshToken = expiredToken,
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(-1)
+            };
+
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+
+            userRepositoryMock
+                .Setup(repository => repository.GetByRefreshTokenAsync(expiredToken))
+                .ReturnsAsync(user);
+
+            UserService userService = CreateUserService(userRepositoryMock);
+
+            TokenResponseDto? result = await userService.RefreshTokenAsync(expiredToken);
+
+            result.Should().BeNull();
+
+            userRepositoryMock.Verify(repository => repository.GetByRefreshTokenAsync(expiredToken), Times.Once);
+        }
+
+        // JWT TOKEN TESTS
+
+        [Fact]
+        public async Task LoginAsync_GeneratedToken_ShouldContainUserClaims()
+        {
+            LoginUserDto dto = new LoginUserDto
+            {
+                Email = "larissa@email.com",
+                Password = "123456"
+            };
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword("123456");
+            Guid userId = Guid.NewGuid();
+
+            User user = new User
+            {
+                Id = userId,
+                Name = "Larissa",
+                Email = "larissa@email.com",
+                PasswordHash = hashedPassword,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+
+            userRepositoryMock
+                .Setup(repository => repository.GetByEmailAsync(dto.Email))
+                .ReturnsAsync(user);
+
+            userRepositoryMock
+                .Setup(repository => repository.UpdateAsync(It.IsAny<User>()))
+                .Returns(Task.CompletedTask);
+
+            UserService userService = CreateUserService(userRepositoryMock);
+
+            TokenResponseDto? result = await userService.LoginAsync(dto);
+
+            result.Should().NotBeNull();
+            result!.Token.Should().NotBeNullOrEmpty();
+
+            System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler handler =
+                new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+
+            System.IdentityModel.Tokens.Jwt.JwtSecurityToken jwt =
+                handler.ReadJwtToken(result.Token);
+
+            jwt.Subject.Should().Be(userId.ToString());
+        }
+
         // PUT TESTS
         [Fact]
         public async Task UpdateAsync_ShouldUpdateUserSuccessfully_WhenDataIsValid()
         {
-            // Arrange
             Guid userId = Guid.NewGuid();
             UpdateUserDto dto = new UpdateUserDto
             {
@@ -364,12 +536,10 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetByEmailAsync(dto.Email))
                 .ReturnsAsync((User?)null);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
-            // Act
             UserResponseDto? result = await userService.UpdateAsync(userId, dto);
 
-            // Assert
             result.Should().NotBeNull();
             result!.Id.Should().Be(userId);
             result.Name.Should().Be("Larissa Updated");
@@ -396,7 +566,7 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.DeleteAsync(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
             bool result = await userService.DeleteAsync(userId);
 
@@ -417,7 +587,7 @@ namespace DebugMeBackend.Tests.Services
                 .Setup(repository => repository.GetByIdAsync(userId))
                 .ReturnsAsync((User?)null);
 
-            UserService userService = new UserService(userRepositoryMock.Object);
+            UserService userService = CreateUserService(userRepositoryMock);
 
             bool result = await userService.DeleteAsync(userId);
 

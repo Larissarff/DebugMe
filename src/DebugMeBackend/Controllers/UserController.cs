@@ -1,11 +1,13 @@
 using DebugMeBackend.DTOs.User;
 using DebugMeBackend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DebugMeBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
@@ -16,7 +18,8 @@ namespace DebugMeBackend.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<UserResponseDto>> Create([FromBody] CreateUserDto dto)
+        [AllowAnonymous]
+        public async Task<ActionResult<TokenResponseDto>> Create([FromBody] CreateUserDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -25,12 +28,12 @@ namespace DebugMeBackend.Controllers
 
             try
             {
-                UserResponseDto createdUser = await _userService.CreateAsync(dto);
+                TokenResponseDto tokenResponse = await _userService.CreateAsync(dto);
 
                 return CreatedAtAction(
                     nameof(GetById),
-                    new { id = createdUser.Id },
-                    createdUser
+                    new { id = tokenResponse.User.Id },
+                    tokenResponse
                 );
             }
             catch (InvalidOperationException ex)
@@ -40,21 +43,41 @@ namespace DebugMeBackend.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<UserResponseDto>> Login([FromBody] LoginUserDto dto)
+        [AllowAnonymous]
+        public async Task<ActionResult<TokenResponseDto>> Login([FromBody] LoginUserDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
 
-            UserResponseDto? user = await _userService.LoginAsync(dto);
+            TokenResponseDto? tokenResponse = await _userService.LoginAsync(dto);
 
-            if (user is null)
+            if (tokenResponse is null)
             {
                 return Unauthorized(new { message = "E-mail ou senha inválidos." });
             }
 
-            return Ok(user);
+            return Ok(tokenResponse);
+        }
+
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<ActionResult<TokenResponseDto>> Refresh([FromBody] RefreshTokenRequestDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            TokenResponseDto? tokenResponse = await _userService.RefreshTokenAsync(dto.RefreshToken);
+
+            if (tokenResponse is null)
+            {
+                return Unauthorized(new { message = "Refresh token inválido ou expirado." });
+            }
+
+            return Ok(tokenResponse);
         }
 
         [HttpGet("all")]

@@ -1,19 +1,27 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using DebugMeBackend.DTOs.User;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Repositories.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DebugMeBackend.Services
 {
     public class UserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _configuration = configuration;
         }
 
-        public async Task<UserResponseDto> CreateAsync(CreateUserDto dto)
+        public async Task<TokenResponseDto> CreateAsync(CreateUserDto dto)
         {
             string normalizedEmail = dto.Email.Trim().ToLower();
 
@@ -31,9 +39,23 @@ namespace DebugMeBackend.Services
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
             };
 
+            string token = GenerateJwtToken(user);
+            string refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(
+                int.Parse(_configuration["Jwt:RefreshTokenExpiryDays"] ?? "7"));
+
             await _userRepository.AddAsync(user);
 
-            return MapToResponse(user);
+            return new TokenResponseDto
+            {
+                Token = token,
+                RefreshToken = refreshToken,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(
+                    int.Parse(_configuration["Jwt:AccessTokenExpiryMinutes"] ?? "60")),
+                User = MapToResponse(user)
+            };
         }
 
         public async Task<UserResponseDto?> GetByIdAsync(Guid id)
@@ -59,7 +81,7 @@ namespace DebugMeBackend.Services
             return response;
         }
 
-        public async Task<UserResponseDto?> LoginAsync(LoginUserDto dto)
+        public async Task<TokenResponseDto?> LoginAsync(LoginUserDto dto)
         {
             string normalizedEmail = dto.Email.Trim().ToLower();
 
@@ -77,7 +99,49 @@ namespace DebugMeBackend.Services
                 return null;
             }
 
-            return MapToResponse(user);
+            string token = GenerateJwtToken(user);
+            string refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(
+                int.Parse(_configuration["Jwt:RefreshTokenExpiryDays"] ?? "7"));
+            await _userRepository.UpdateAsync(user);
+
+            return new TokenResponseDto
+            {
+                Token = token,
+                RefreshToken = refreshToken,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(
+                    int.Parse(_configuration["Jwt:AccessTokenExpiryMinutes"] ?? "60")),
+                User = MapToResponse(user)
+            };
+        }
+
+        public async Task<TokenResponseDto?> RefreshTokenAsync(string refreshToken)
+        {
+            User? user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+
+            if (user is null || user.RefreshTokenExpiry is null || user.RefreshTokenExpiry < DateTime.UtcNow)
+            {
+                return null;
+            }
+
+            string newToken = GenerateJwtToken(user);
+            string newRefreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(
+                int.Parse(_configuration["Jwt:RefreshTokenExpiryDays"] ?? "7"));
+            await _userRepository.UpdateAsync(user);
+
+            return new TokenResponseDto
+            {
+                Token = newToken,
+                RefreshToken = newRefreshToken,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(
+                    int.Parse(_configuration["Jwt:AccessTokenExpiryMinutes"] ?? "60")),
+                User = MapToResponse(user)
+            };
         }
 
         public async Task<UserResponseDto?> UpdateAsync(Guid id, UpdateUserDto dto)
@@ -118,6 +182,39 @@ namespace DebugMeBackend.Services
             await _userRepository.DeleteAsync(user);
 
             return true;
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            string secret = _configuration["Jwt:Secret"]
+                ?? throw new InvalidOperationException("JWT Secret is not configured.");
+
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+            SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            Claim[] claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            JwtSecurityToken token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(
+                    int.Parse(_configuration["Jwt:AccessTokenExpiryMinutes"] ?? "60")),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private static string GenerateRefreshToken()
+        {
+            byte[] randomBytes = RandomNumberGenerator.GetBytes(64);
+            return Convert.ToBase64String(randomBytes);
         }
 
         private static UserResponseDto MapToResponse(User user)
