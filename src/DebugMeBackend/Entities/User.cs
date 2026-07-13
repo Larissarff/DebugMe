@@ -16,6 +16,13 @@ namespace DebugMeBackend.Entities
 
         [JsonIgnore]
         public string PasswordHash { get; set; } = string.Empty;
+
+        [JsonIgnore]
+        public string? RefreshToken { get; set; }
+
+        [JsonIgnore]
+        public DateTime? RefreshTokenExpiry { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
