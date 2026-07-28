@@ -69,17 +69,23 @@ O DebugMe aplica conceitos de engenharia de software ao desenvolvimento pessoal:
 
 ### Backend
 - C#
-- ASP.NET Core Web API
+- ASP.NET Core Web API (.NET 9)
 - Entity Framework Core
-- SQL Server / PostgreSQL
+- JWT Authentication (access + refresh tokens)
+- BCrypt password hashing
+
+### Banco de Dados
+- **Desenvolvimento:** SQLite
+- **Produção:** MySQL 8.0+ (via Pomelo.EntityFrameworkCore.MySql)
 
 ### Frontend
-- Angular
-- TypeScript
+- Angular 21 (standalone components)
+- TypeScript 5.9
 - RxJS
 
 ### Infra
 - GitHub
+- Docker (MySQL local)
 
 ---
 
@@ -171,6 +177,64 @@ Criando uma abordagem inovadora para evolução individual.
 ## 📌 Status do projeto
 
 🚧 Em desenvolvimento (MVP em construção)
+
+---
+
+## ⚡ Quick Start
+
+### Pré-requisitos
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [Node.js 20+](https://nodejs.org/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (para MySQL)
+
+### Backend
+
+```bash
+# Desenvolvimento (SQLite - não requer Docker)
+cd src/DebugMeBackend
+dotnet run
+# API disponível em http://localhost:5165
+# Swagger em http://localhost:5165/swagger
+```
+
+### MySQL (Produção)
+
+```bash
+# Subir container MySQL
+docker run --name debugme-mysql \
+  -e MYSQL_ROOT_PASSWORD=debugme123 \
+  -e MYSQL_DATABASE=DebugMeDb \
+  -p 3306:3306 \
+  -d mysql:8.0
+
+# Inicializar tabelas
+mysql -h 127.0.0.1 -u root -pdebugme123 DebugMeDb < src/DebugMeBackend/Data/init-mysql.sql
+
+# Rodar backend com MySQL
+set ASPNETCORE_ENVIRONMENT=Production
+cd src/DebugMeBackend
+dotnet run
+```
+
+### Frontend
+
+```bash
+cd src/debugme-frontend
+npm install
+npm start
+# Disponível em http://localhost:4200
+```
+
+### Testes
+
+```bash
+# Backend (47 testes)
+dotnet test tests/DebugMeBackend.Tests
+
+# Frontend (em configuração)
+cd src/debugme-frontend
+npm test
+```
 
 ---
 

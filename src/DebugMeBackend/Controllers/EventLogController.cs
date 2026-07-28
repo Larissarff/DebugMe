@@ -44,7 +44,7 @@ public class EventLogController : ControllerBase
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult<EventLogResponseDto>> Create([FromBody] EventLog eventLog)
+    public async Task<ActionResult<EventLogResponseDto>> Create([FromBody] CreateEventLogDto dto)
     {
         if (!ModelState.IsValid)
         {
@@ -53,16 +53,29 @@ public class EventLogController : ControllerBase
 
         try
         {
+            EventLog eventLog = new EventLog
+            {
+                UserId = dto.UserId,
+                EmotionId = dto.EmotionId,
+                Description = dto.Description ?? string.Empty,
+                Intensity = dto.Intensity,
+                EventDate = dto.EventDate
+            };
+
             EventLog createdEventLog = await _eventLogService.CreateAsync(eventLog);
-            EventLogResponseDto dto = MapToDto(createdEventLog);
+            EventLogResponseDto responseDto = MapToDto(createdEventLog);
 
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = createdEventLog.Id },
-                dto
+                responseDto
             );
         }
         catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
         }
