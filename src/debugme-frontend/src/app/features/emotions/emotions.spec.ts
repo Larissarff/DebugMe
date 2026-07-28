@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { Emotions } from './emotions';
 
 describe('Emotions', () => {
@@ -13,7 +12,7 @@ describe('Emotions', () => {
 
     fixture = TestBed.createComponent(Emotions);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
