@@ -39,6 +39,7 @@ export class Login {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
+        this.loading = false;
         this.router.navigate(['/home']);
       },
       error: (error: Error) => {

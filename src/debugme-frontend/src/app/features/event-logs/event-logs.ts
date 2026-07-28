@@ -23,19 +23,22 @@ export class EventLogs implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('[EventLogs] ngOnInit called');
     this.loadEventLogs();
   }
 
   private loadEventLogs(): void {
+    console.log('[EventLogs] loadEventLogs called');
     this.loading = true;
     this.errorMessage = '';
-
     this.eventLogService.getAll().subscribe({
       next: (logs) => {
+        console.log('[EventLogs] logs loaded:', logs.length);
         this.eventLogs = logs;
         this.loading = false;
       },
       error: (error: Error) => {
+        console.error('[EventLogs] error:', error);
         this.errorMessage = error.message;
         this.loading = false;
       }

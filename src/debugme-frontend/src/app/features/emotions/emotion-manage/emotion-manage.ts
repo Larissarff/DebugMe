@@ -34,18 +34,22 @@ export class EmotionManage implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('[EmotionManage] ngOnInit called');
     this.loadEmotions();
   }
 
   private loadEmotions(): void {
+    console.log('[EmotionManage] loadEmotions called');
     this.loading = true;
     this.errorMessage = '';
     this.emotionService.getAll().subscribe({
       next: (emotions) => {
+        console.log('[EmotionManage] emotions loaded:', emotions.length);
         this.emotions = emotions;
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('[EmotionManage] error:', err);
         this.errorMessage = 'Erro ao carregar emoções. Tente novamente.';
         this.loading = false;
       }

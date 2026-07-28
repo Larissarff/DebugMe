@@ -37,6 +37,7 @@ export class EventCreate implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('[EventCreate] ngOnInit called');
     this.loadEmotions();
   }
 
@@ -46,13 +47,16 @@ export class EventCreate implements OnInit {
   }
 
   private loadEmotions(): void {
+    console.log('[EventCreate] loadEmotions called');
     this.loadingEmotions = true;
     this.emotionService.getAll().subscribe({
       next: (emotions) => {
+        console.log('[EventCreate] emotions loaded:', emotions.length);
         this.emotions = emotions;
         this.loadingEmotions = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('[EventCreate] error:', err);
         this.errorMessage = 'Erro ao carregar emoções. Tente novamente.';
         this.loadingEmotions = false;
       }
@@ -84,6 +88,7 @@ export class EventCreate implements OnInit {
       eventDate: new Date(formValue.eventDate).toISOString()
     }).subscribe({
       next: () => {
+        this.loading = false;
         this.router.navigate(['/events']);
       },
       error: (error: Error) => {
