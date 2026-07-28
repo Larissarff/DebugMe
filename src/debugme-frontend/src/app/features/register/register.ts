@@ -53,6 +53,7 @@ export class Register {
       password: this.registerForm.value.password
     }).subscribe({
       next: () => {
+        this.loading = false;
         this.router.navigate(['/home']);
       },
       error: (error: Error) => {
