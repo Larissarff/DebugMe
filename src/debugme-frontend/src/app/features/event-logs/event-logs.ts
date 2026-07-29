@@ -113,10 +113,11 @@ export class EventLogs implements OnInit {
   }
 
   getIntensityColor(intensity: number): string {
-    if (intensity <= 3) return '#22c55e';
-    if (intensity <= 6) return '#eab308';
-    if (intensity <= 8) return '#f97316';
-    return '#ef4444';
+    if (intensity <= 2) return '#e8d5f5';
+    if (intensity <= 4) return '#c9a0e8';
+    if (intensity <= 6) return '#a560d4';
+    if (intensity <= 8) return '#7b3db8';
+    return '#643aa4';
   }
 
   formatDate(dateStr: string): string {

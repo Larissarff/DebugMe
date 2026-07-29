@@ -4,12 +4,29 @@
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+    <div class="blob blob-5"></div>
+  </div>
+
+  <!-- Code decoration layer -->
+  <div class="code-decoration">
+    <span class="code-line" style="top: 12%; left: 8%; animation-delay: 0s;">try {{ '{' }}</span>
+    <span class="code-line" style="top: 18%; left: 10%; animation-delay: 1.2s;">  await auth.login();</span>
+    <span class="code-line" style="top: 30%; right: 10%; animation-delay: 2.4s;">// debug your emotions</span>
+    <span class="code-line" style="top: 55%; left: 6%; animation-delay: 3.6s;">catch (error) {{ '{' }}</span>
+    <span class="code-line" style="top: 62%; left: 8%; animation-delay: 4.8s;">  console.log(error);</span>
+    <span class="code-line" style="bottom: 20%; right: 14%; animation-delay: 6s;">refactor();</span>
   </div>
 
   <div class="login-card">
     <div class="card-brand">
       <img class="brand-logo" src="images/debugme_logo_principal.png" alt="DebugMe" />
       <p class="subtitle">Seu espaço para registrar e compreender suas emoções</p>
+    </div>
+
+    <!-- Rotating phrase -->
+    <div class="rotating-phrase">
+      <span class="phrase-text">{{ currentPhrase }}</span>
     </div>
 
     <div class="error-message" *ngIf="errorMessage">

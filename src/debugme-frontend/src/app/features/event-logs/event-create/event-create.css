@@ -226,11 +226,11 @@
 }
 
 .intensity-low {
-  color: #22c55e;
+  color: #c9a0e8;
 }
 
 .intensity-high {
-  color: #ef4444;
+  color: #643aa4;
 }
 
 .intensity-slider {
@@ -239,7 +239,7 @@
   appearance: none;
   height: 6px;
   border-radius: 3px;
-  background: linear-gradient(to right, #22c55e, #eab308, #f97316, #ef4444);
+  background: linear-gradient(to right, #e8d5f5, #c9a0e8, #a560d4, #7b3db8, #643aa4);
   outline: none;
   border: none;
   padding: 0;
