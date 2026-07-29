@@ -1,3 +1,4 @@
+using DebugMeBackend.DTOs.Emotion;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -22,6 +23,13 @@ namespace DebugMeBackend.Controllers
         {
             IEnumerable<Emotion> emotions = await _emotionService.GetAllAsync();
             return Ok(emotions);
+        }
+
+        [HttpGet("all-with-count")]
+        public async Task<ActionResult<IEnumerable<EmotionWithCountDto>>> GetAllWithCount()
+        {
+            IEnumerable<EmotionWithCountDto> dtos = await _emotionService.GetAllWithEventCountAsync();
+            return Ok(dtos);
         }
 
         [HttpGet("id/{id:guid}")]

@@ -12,4 +12,6 @@ public class Emotion
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+
+    public ICollection<EventLog> EventLogs { get; set; } = new List<EventLog>();
 }

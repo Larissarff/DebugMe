@@ -71,7 +71,7 @@ namespace DebugMeBackend.Data
                       .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(el => el.Emotion)
-                      .WithMany()
+                      .WithMany(e => e.EventLogs)
                       .HasForeignKey(el => el.EmotionId)
                       .OnDelete(DeleteBehavior.Cascade);
             });

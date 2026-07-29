@@ -7,6 +7,7 @@ namespace DebugMeBackend.Repositories.Interfaces
         Task<Emotion?> GetByIdAsync(Guid id);
         Task<Emotion?> GetByNameAsync(string name);
         Task<IEnumerable<Emotion>> GetAllAsync();
+        Task<IEnumerable<Emotion>> GetAllWithEventCountAsync();
         Task AddAsync(Emotion emotion);
         Task UpdateAsync(Emotion emotion);
         Task DeleteAsync(Emotion emotion);

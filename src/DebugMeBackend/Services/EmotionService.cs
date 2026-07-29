@@ -1,3 +1,4 @@
+using DebugMeBackend.DTOs.Emotion;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Repositories.Interfaces;
 
@@ -93,6 +94,20 @@ namespace DebugMeBackend.Services
             await _emotionRepository.UpdateAsync(emotionEdited);
 
             return emotionEdited;
+        }
+
+        public async Task<IEnumerable<EmotionWithCountDto>> GetAllWithEventCountAsync()
+        {
+            IEnumerable<Emotion> emotions = await _emotionRepository.GetAllWithEventCountAsync();
+            return emotions.Select(e => new EmotionWithCountDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Description = e.Description,
+                EventCount = e.EventLogs?.Count ?? 0,
+                CreatedAt = e.CreatedAt,
+                UpdatedAt = e.UpdatedAt
+            });
         }
 
         public async Task DeleteAsync(Guid id)
