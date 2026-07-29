@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DebugMeBackend.DTOs.EventLog;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Services;
@@ -21,7 +22,8 @@ public class EventLogController : ControllerBase
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<EventLogResponseDto>>> GetAll()
     {
-        IEnumerable<EventLog> eventLogs = await _eventLogService.GetAllAsync();
+        Guid userId = GetUserIdFromToken();
+        IEnumerable<EventLog> eventLogs = await _eventLogService.GetByUserIdAsync(userId);
         IEnumerable<EventLogResponseDto> dtos = eventLogs.Select(MapToDto);
         return Ok(dtos);
     }
@@ -107,8 +109,28 @@ public class EventLogController : ControllerBase
     [HttpDelete("delete/{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
     {
+        Guid userId = GetUserIdFromToken();
+        EventLog? existing = await _eventLogService.GetByIdAsync(id);
+
+        if (existing is null)
+            return NotFound(new { message = "Registro não encontrado." });
+
+        if (existing.UserId != userId)
+            return Forbid();
+
         await _eventLogService.DeleteAsync(id);
         return NoContent();
+    }
+
+    private Guid GetUserIdFromToken()
+    {
+        string? sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? User.FindFirst("sub")?.Value;
+
+        if (sub is null || !Guid.TryParse(sub, out Guid userId))
+            throw new UnauthorizedAccessException("Token inválido: userId não encontrado.");
+
+        return userId;
     }
 
     private static EventLogResponseDto MapToDto(EventLog eventLog)
