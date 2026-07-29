@@ -2,6 +2,8 @@
 /* Identidade visual: paleta #f8eef1 (fundo claro), #a560d4 (primária), #643aa4 (escura) */
 /* Fonte da marca: Arturo (headings). Fallback: Nunito para corpo, serif display para headings. */
 
+@import './styles-dark.css';
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
 
 /*
