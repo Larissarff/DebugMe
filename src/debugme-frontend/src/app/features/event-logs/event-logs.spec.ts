@@ -35,19 +35,19 @@ describe('EventLogs', () => {
     expect(component.eventLogs).toEqual([]);
   });
 
-  it('should return green color for low intensity', () => {
-    expect(component.getIntensityColor(3)).toBe('#22c55e');
+  it('should return lilac for low intensity', () => {
+    expect(component.getIntensityColor(2)).toBe('#e8d5f5');
   });
 
-  it('should return yellow color for medium intensity', () => {
-    expect(component.getIntensityColor(5)).toBe('#eab308');
+  it('should return medium purple for medium intensity', () => {
+    expect(component.getIntensityColor(5)).toBe('#a560d4');
   });
 
-  it('should return orange color for high intensity', () => {
-    expect(component.getIntensityColor(7)).toBe('#f97316');
+  it('should return dark purple for high intensity', () => {
+    expect(component.getIntensityColor(8)).toBe('#7b3db8');
   });
 
-  it('should return red color for very high intensity', () => {
-    expect(component.getIntensityColor(9)).toBe('#ef4444');
+  it('should return deepest purple for very high intensity', () => {
+    expect(component.getIntensityColor(10)).toBe('#643aa4');
   });
 });

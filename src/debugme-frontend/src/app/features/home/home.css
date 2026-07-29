@@ -218,39 +218,185 @@
   font-weight: 400;
 }
 
-/* ── Action Cards ── */
-.actions-section {
+/* ── Dashboard Section (Calendar + Actions) ── */
+.dashboard-section {
   display: flex;
-  gap: 28px;
+  gap: 32px;
   width: 100%;
+  max-width: 960px;
+  align-items: stretch;
   justify-content: center;
-  flex-wrap: wrap;
+}
+
+/* ── Calendar Section ── */
+.calendar-section {
+  flex: 1 1 520px;
+  max-width: 560px;
+  display: flex;
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.calendar-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-radius: 24px;
+  padding: 28px;
+  border: 1px solid rgba(165, 96, 212, 0.1);
+  box-shadow: 0 8px 32px rgba(100, 58, 164, 0.05);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendar-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d1b4e;
+  text-transform: capitalize;
+}
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #8b7aaa;
+  font-family: 'Inter', sans-serif;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-low {
+  background: #e8d5f5;
+  margin-left: 8px;
+}
+
+.legend-high {
+  background: #643aa4;
+}
+
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #a89bc2;
+  font-family: 'Inter', sans-serif;
+  padding-bottom: 8px;
+}
+
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  flex: 1;
+  min-height: 0;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  position: relative;
+  transition: background 0.2s ease;
+  cursor: default;
+  padding: 4px 2px;
+  min-height: 0;
+}
+
+.calendar-day.empty {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.day-number {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a366b;
+  font-family: 'Inter', sans-serif;
+  line-height: 1;
+}
+
+.calendar-day.today {
+  background: rgba(165, 96, 212, 0.12);
+}
+
+.calendar-day.today .day-number {
+  color: #643aa4;
+  font-weight: 700;
+}
+
+.day-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 2px;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.calendar-day:hover .day-dot {
+  transform: scale(1.5);
+}
+
+/* ── Actions Column ── */
+.actions-column {
+  flex: 0 0 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeInUp 0.6s ease-out 0.35s both;
 }
 
 .action-card {
   position: relative;
   flex: 1;
-  min-width: 260px;
-  max-width: 340px;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 24px;
-  padding: 32px 28px 28px;
+  border-radius: 20px;
+  padding: 22px 20px;
   border: 1px solid rgba(165, 96, 212, 0.08);
   box-shadow:
-    0 4px 24px rgba(100, 58, 164, 0.06),
+    0 4px 20px rgba(100, 58, 164, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .action-card::after {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 24px;
+  border-radius: 20px;
   background: linear-gradient(135deg, rgba(165, 96, 212, 0.06), transparent 60%);
   opacity: 0;
   transition: opacity 0.4s ease;
@@ -262,12 +408,12 @@
 }
 
 .action-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
   box-shadow:
-    0 16px 48px rgba(165, 96, 212, 0.12),
-    0 0 0 1px rgba(165, 96, 212, 0.15),
+    0 12px 36px rgba(165, 96, 212, 0.12),
+    0 0 0 1px rgba(165, 96, 212, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  border-color: rgba(165, 96, 212, 0.2);
+  border-color: rgba(165, 96, 212, 0.18);
 }
 
 .card-glow {
@@ -297,16 +443,15 @@
 }
 
 .action-icon-wrapper {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   background: linear-gradient(135deg, rgba(165, 96, 212, 0.12), rgba(100, 58, 164, 0.06));
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
   transition: all 0.3s ease;
-  position: relative;
+  flex-shrink: 0;
 }
 
 .action-card:hover .action-icon-wrapper {
@@ -315,7 +460,7 @@
 }
 
 .action-icon {
-  font-size: 26px;
+  font-size: 22px;
   transition: transform 0.3s ease;
 }
 
@@ -323,31 +468,31 @@
   transform: scale(1.1);
 }
 
-.action-card h3 {
-  margin: 0 0 8px 0;
-  font-size: 19px;
+.action-card-text h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
   font-weight: 700;
   color: #2d1b4e;
   letter-spacing: -0.2px;
   transition: color 0.3s ease;
 }
 
-.action-card:hover h3 {
+.action-card:hover .action-card-text h3 {
   color: #643aa4;
 }
 
-.action-card p {
-  margin: 0 0 16px 0;
-  font-size: 14px;
+.action-card-text p {
+  margin: 0;
+  font-size: 13px;
   color: #6b5b8a;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .card-hint {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #a560d4;
   opacity: 0;
