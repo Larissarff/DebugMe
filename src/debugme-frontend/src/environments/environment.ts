@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:5165'
+  apiUrl: 'https://debugme-601s.onrender.com'
 };
