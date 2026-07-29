@@ -63,8 +63,8 @@
 
 /* ── Home ── */
 [data-theme="dark"] .home-header {
-  background: rgba(26, 15, 26, 0.78);
-  border-bottom-color: rgba(180, 120, 210, 0.12);
+  background: rgba(248, 238, 241, 0.78);
+  border-bottom-color: rgba(165, 96, 212, 0.12);
 }
 
 [data-theme="dark"] .user-greeting {
@@ -84,11 +84,11 @@
 }
 
 [data-theme="dark"] .welcome-section h2 {
-  color: #efe0f5;
+  color: #f5edfa;
 }
 
 [data-theme="dark"] .welcome-text {
-  color: #bcaccc;
+  color: #d4c8e0;
 }
 
 [data-theme="dark"] .cursor-blink {
@@ -103,12 +103,12 @@
 
 [data-theme="dark"] .action-card h3,
 [data-theme="dark"] .action-card-text h3 {
-  color: #efe0f5;
+  color: #f5edfa;
 }
 
 [data-theme="dark"] .action-card p,
 [data-theme="dark"] .action-card-text p {
-  color: #bcaccc;
+  color: #d4c8e0;
 }
 
 [data-theme="dark"] .action-card:hover {
@@ -125,11 +125,11 @@
 }
 
 [data-theme="dark"] .footer-quote {
-  color: #8a7898;
+  color: #efe0f5;
 }
 
 [data-theme="dark"] .app-title {
-  color: #efe0f5;
+  color: #f5edfa;
 }
 
 /* ── Login ── */
@@ -202,7 +202,7 @@
 
 [data-theme="dark"] .list-header h1,
 [data-theme="dark"] .manage-header h1 {
-  color: #efe0f5;
+  color: #f5edfa;
 }
 
 [data-theme="dark"] .header-subtitle {
@@ -258,7 +258,7 @@
 }
 
 [data-theme="dark"] .card-header h1 {
-  color: #efe0f5;
+  color: #f5edfa;
 }
 
 [data-theme="dark"] .char-counter,
@@ -281,7 +281,7 @@
 
 [data-theme="dark"] .form-card h2,
 [data-theme="dark"] .list-card h2 {
-  color: #efe0f5;
+  color: #f5edfa;
 }
 
 [data-theme="dark"] .form-subtitle,
@@ -340,15 +340,15 @@
 }
 
 [data-theme="dark"] .empty-state h3 {
-  color: #efe0f5;
+  color: #f5edfa;
 }
 
 [data-theme="dark"] .empty-state p {
-  color: #a894b8;
+  color: #d4c8e0;
 }
 
 [data-theme="dark"] .empty-emotions p {
-  color: #a894b8;
+  color: #d4c8e0;
 }
 
 /* ── Calendar ── */
@@ -359,7 +359,7 @@
 }
 
 [data-theme="dark"] .calendar-header h3 {
-  color: #efe0f5;
+  color: #f5edfa;
 }
 
 [data-theme="dark"] .calendar-weekdays {

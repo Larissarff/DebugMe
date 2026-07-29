@@ -9,7 +9,7 @@
   <!-- Header -->
   <header class="home-header">
     <div class="header-content">
-      <img class="app-logo" src="images/debugme_logo_horizontal.png" alt="DebugMe" />
+      <img class="app-logo" src="images/debugme_logo_horizontal.png" alt="DebugMe" width="116" height="42" />
       <div class="header-right">
         <app-theme-toggle></app-theme-toggle>
         <span class="user-greeting">
@@ -51,27 +51,20 @@
             <div class="calendar-weekdays">
               <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
             </div>
-            @for (week of calendarWeeks; track week[0].date + week[0].day) {
-              <div class="calendar-week">
-                @for (day of week; track day.date + day.day) {
-                  <div
-                    class="calendar-day"
-                    [class.today]="day.isToday"
-                    [class.empty]="!day.isCurrentMonth"
-                  >
-                    @if (day.isCurrentMonth) {
-                      <span class="day-number">{{ day.day }}</span>
-                      @if (day.count > 0) {
-                        <div
-                          class="day-dot"
-                          [style.background]="getIntensityColor(day.maxIntensity)"
-                          [title]="day.count + ' registro(s)'"
-                        ></div>
-                      }
-                    }
-                  </div>
+            @for (week of calendarWeeks; track $index) {
+            <div class="calendar-week">
+              @for (day of week; track $index) {
+              <div class="calendar-day" [class.today]="day.isToday" [class.empty]="!day.isCurrentMonth">
+                @if (day.isCurrentMonth) {
+                <span class="day-number">{{ day.day }}</span>
+                @if (day.count > 0) {
+                <div class="day-dot" [style.background]="getIntensityColor(day.maxIntensity)"
+                  [title]="day.count + ' registro(s)'"></div>
+                }
                 }
               </div>
+              }
+            </div>
             }
           </div>
         </div>
