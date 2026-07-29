@@ -10,11 +10,11 @@ import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'login', component: Login },
-  { path: 'register', component: Register },
-  { path: 'home', component: Home, canActivate: [AuthGuard] },
-  { path: 'emotions', component: Emotions, canActivate: [AuthGuard] },
-  { path: 'emotions/manage', component: EmotionManage, canActivate: [AuthGuard] },
-  { path: 'events', component: EventLogs, canActivate: [AuthGuard] },
-  { path: 'events/new', component: EventCreate, canActivate: [AuthGuard] }
+  { path: 'login', component: Login, data: { animation: 'login' } },
+  { path: 'register', component: Register, data: { animation: 'register' } },
+  { path: 'home', component: Home, canActivate: [AuthGuard], data: { animation: 'home' } },
+  { path: 'emotions', component: Emotions, canActivate: [AuthGuard], data: { animation: 'emotions' } },
+  { path: 'emotions/manage', component: EmotionManage, canActivate: [AuthGuard], data: { animation: 'emotionManage' } },
+  { path: 'events', component: EventLogs, canActivate: [AuthGuard], data: { animation: 'eventLogs' } },
+  { path: 'events/new', component: EventCreate, canActivate: [AuthGuard], data: { animation: 'eventCreate' } }
 ];

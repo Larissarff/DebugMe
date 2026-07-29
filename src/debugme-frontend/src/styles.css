@@ -1,7 +1,25 @@
 /* === DebugMe — Global Styles === */
-/* Tema terapêutico: violeta acolhedor, bordas fluidas, design orgânico */
+/* Identidade visual: paleta #f8eef1 (fundo claro), #a560d4 (primária), #643aa4 (escura) */
+/* Fonte da marca: Arturo (headings). Fallback: Nunito para corpo, serif display para headings. */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+/*
+ * Arturo font — commercial font by Zetafonts.
+ * To activate: place Arturo-Regular.woff2 and Arturo-Bold.woff2 in public/fonts/
+ * and uncomment the @font-face blocks below.
+ *
+ * @font-face {
+ *   font-family: 'Arturo';
+ *   src: url('/fonts/Arturo-Regular.woff2') format('woff2');
+ *   font-weight: 400; font-style: normal; font-display: swap;
+ * }
+ * @font-face {
+ *   font-family: 'Arturo';
+ *   src: url('/fonts/Arturo-Bold.woff2') format('woff2');
+ *   font-weight: 700; font-style: normal; font-display: swap;
+ * }
+ */
 
 *,
 *::before,
@@ -21,7 +39,7 @@ html {
 body {
   font-family: 'Nunito', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: #2d1b4e;
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 30%, #ede9fe 60%, #fdf4ff 100%);
+  background: linear-gradient(135deg, #f8eef1 0%, #f3e0e8 30%, #ede0f0 60%, #f8eef1 100%);
   background-attachment: fixed;
   line-height: 1.6;
   min-height: 100vh;
@@ -29,45 +47,45 @@ body {
 
 /* Links */
 a {
-  color: #7c3aed;
+  color: #a560d4;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: #6d28d9;
+  color: #643aa4;
   text-decoration: underline;
 }
 
-/* Scrollbar personalizada — tema violeta */
+/* Scrollbar personalizada — tema violeta da marca */
 ::-webkit-scrollbar {
   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(139, 92, 246, 0.06);
+  background: rgba(165, 96, 212, 0.06);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #c4b5fd, #a78bfa);
+  background: linear-gradient(180deg, #d4b8e8, #a560d4);
   border-radius: 5px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(248, 238, 241, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #a78bfa, #8b5cf6);
+  background: linear-gradient(180deg, #a560d4, #643aa4);
 }
 
 /* Seleção de texto */
 ::selection {
-  background: rgba(139, 92, 246, 0.25);
+  background: rgba(165, 96, 212, 0.25);
   color: #2d1b4e;
 }
 
 /* Focus acessível */
 :focus-visible {
-  outline: 2.5px solid #8b5cf6;
+  outline: 2.5px solid #a560d4;
   outline-offset: 3px;
   border-radius: 8px;
 }
@@ -90,10 +108,10 @@ a:hover {
 
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+    box-shadow: 0 0 20px rgba(165, 96, 212, 0.1);
   }
   50% {
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
+    box-shadow: 0 0 30px rgba(165, 96, 212, 0.2);
   }
 }
 
@@ -104,4 +122,59 @@ a:hover {
   50% {
     transform: translateY(-6px);
   }
+}
+
+/* ── Skeleton Loaders ── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(165, 96, 212, 0.06) 25%,
+    rgba(165, 96, 212, 0.1) 37%,
+    rgba(165, 96, 212, 0.06) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeletonShimmer 1.6s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.skeleton-text {
+  height: 16px;
+  margin-bottom: 10px;
+  width: 80%;
+}
+
+.skeleton-text:last-child {
+  width: 60%;
+}
+
+.skeleton-title {
+  height: 24px;
+  margin-bottom: 16px;
+  width: 50%;
+}
+
+.skeleton-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(165, 96, 212, 0.06);
+}
+
+.skeleton-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.skeleton-btn {
+  height: 42px;
+  width: 140px;
+  border-radius: 14px;
 }

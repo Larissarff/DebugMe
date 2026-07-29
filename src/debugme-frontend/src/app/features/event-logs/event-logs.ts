@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { EventLogService } from '../../core/services/event-log.service';
 import { AuthService } from '../../core/services/auth.service';
 import { EventLog } from '../../core/models/event-log.model';
+import { ToastService } from '../../shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-event-logs',
@@ -17,10 +18,17 @@ export class EventLogs implements OnInit {
   errorMessage = '';
   deletingId: string | null = null;
 
+  sparklinePath = '';
+  sparklineViewBox = '0 0 200 40';
+  avgIntensity = 0;
+  trendLabel = '';
+
   constructor(
     private eventLogService: EventLogService,
     private authService: AuthService
   ) {}
+
+  private toastService = inject(ToastService);
 
   ngOnInit(): void {
     console.log('[EventLogs] ngOnInit called');
@@ -36,6 +44,7 @@ export class EventLogs implements OnInit {
         console.log('[EventLogs] logs loaded:', logs.length);
         this.eventLogs = logs;
         this.loading = false;
+        this.generateSparkline();
       },
       error: (error: Error) => {
         console.error('[EventLogs] error:', error);
@@ -43,6 +52,37 @@ export class EventLogs implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  private generateSparkline(): void {
+    const logs = [...this.eventLogs].reverse();
+    if (logs.length < 2) return;
+
+    const intensities = logs.map(l => l.intensity);
+    const max = 10;
+    const min = 1;
+    const width = 200;
+    const height = 40;
+    const padding = 4;
+
+    const xStep = (width - padding * 2) / (intensities.length - 1);
+    const points = intensities.map((val, i) => {
+      const x = padding + i * xStep;
+      const y = height - padding - ((val - min) / (max - min)) * (height - padding * 2);
+      return `${x},${y}`;
+    });
+
+    this.sparklinePath = `M${points.join(' L')}`;
+    this.sparklineViewBox = `0 0 ${width} ${height}`;
+
+    const sum = intensities.reduce((a, b) => a + b, 0);
+    this.avgIntensity = Math.round((sum / intensities.length) * 10) / 10;
+
+    const first = intensities[0];
+    const last = intensities[intensities.length - 1];
+    if (last > first) this.trendLabel = '↑ crescendo';
+    else if (last < first) this.trendLabel = '↓ diminuindo';
+    else this.trendLabel = '→ estável';
   }
 
   confirmDelete(id: string): void {
@@ -58,6 +98,8 @@ export class EventLogs implements OnInit {
       next: () => {
         this.eventLogs = this.eventLogs.filter(log => log.id !== id);
         this.deletingId = null;
+        this.generateSparkline();
+        this.toastService.success('Registro excluído com sucesso');
       },
       error: (error: Error) => {
         this.errorMessage = error.message;
