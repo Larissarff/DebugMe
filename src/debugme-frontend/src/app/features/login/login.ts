@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -10,11 +10,22 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
+export class Login implements OnInit, OnDestroy {
   loginForm: FormGroup;
   submitted: boolean = false;
   loading: boolean = false;
   errorMessage: string = '';
+
+  rotatingPhrases: string[] = [
+    'debugue suas emoções.',
+    'compile seus sentimentos.',
+    'resolva seus bugs internos.',
+    'refatore seu bem-estar.',
+    'deploy sua melhor versão.'
+  ];
+  currentPhrase = '';
+  private phraseIndex = 0;
+  private phraseInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -25,6 +36,20 @@ export class Login {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  ngOnInit(): void {
+    this.currentPhrase = this.rotatingPhrases[0];
+    this.phraseInterval = setInterval(() => {
+      this.phraseIndex = (this.phraseIndex + 1) % this.rotatingPhrases.length;
+      this.currentPhrase = this.rotatingPhrases[this.phraseIndex];
+    }, 4000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.phraseInterval) {
+      clearInterval(this.phraseInterval);
+    }
   }
 
   onSubmit(): void {
