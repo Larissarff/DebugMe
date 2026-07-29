@@ -22,10 +22,24 @@
       {{ errorMessage }}
     </div>
 
-    <!-- Loading -->
-    <div class="loading-state" *ngIf="loading">
-      <span class="spinner"></span>
-      <span>Carregando emoções...</span>
+    <!-- Loading (Skeleton) -->
+    <div class="manage-layout" *ngIf="loading">
+      <section class="form-section">
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-text"></div>
+          <div class="skeleton skeleton-text"></div>
+          <div class="skeleton skeleton-btn" style="margin-top: 16px;"></div>
+        </div>
+      </section>
+      <section class="list-section">
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-text"></div>
+          <div class="skeleton skeleton-text"></div>
+          <div class="skeleton skeleton-text"></div>
+        </div>
+      </section>
     </div>
 
     <div class="manage-layout" *ngIf="!loading">

@@ -16,9 +16,13 @@
       {{ errorMessage }}
     </div>
 
-    <div class="loading-emotions" *ngIf="loadingEmotions">
-      <span class="spinner"></span>
-      <span>Preparando suas emoções...</span>
+    <!-- Loading (Skeleton) -->
+    <div class="skeleton-card" *ngIf="loadingEmotions" style="margin-top: 24px;">
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text" style="width: 40%;"></div>
+      <div class="skeleton skeleton-btn" style="margin-top: 24px;"></div>
     </div>
 
     <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" *ngIf="!loadingEmotions">
