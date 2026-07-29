@@ -8,6 +8,10 @@ export interface CreateEmotionRequest {
   description?: string;
 }
 
+export interface EmotionWithCount extends Emotion {
+  eventCount: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,6 +20,10 @@ export class EmotionService {
 
   getAll(): Observable<Emotion[]> {
     return this.api.get<Emotion[]>('/api/emotion/all');
+  }
+
+  getAllWithCount(): Observable<EmotionWithCount[]> {
+    return this.api.get<EmotionWithCount[]>('/api/emotion/all-with-count');
   }
 
   getById(id: string): Observable<Emotion> {

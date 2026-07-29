@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { EmotionService, CreateEmotionRequest } from '../../../core/services/emotion.service';
-import { Emotion } from '../../../core/models/emotion.model';
+import { EmotionService, CreateEmotionRequest, EmotionWithCount } from '../../../core/services/emotion.service';
 
 @Component({
   selector: 'app-emotion-manage',
@@ -12,7 +11,7 @@ import { Emotion } from '../../../core/models/emotion.model';
   styleUrl: './emotion-manage.css'
 })
 export class EmotionManage implements OnInit {
-  emotions: Emotion[] = [];
+  emotions: EmotionWithCount[] = [];
   loading = true;
   errorMessage = '';
 
@@ -42,7 +41,7 @@ export class EmotionManage implements OnInit {
     console.log('[EmotionManage] loadEmotions called');
     this.loading = true;
     this.errorMessage = '';
-    this.emotionService.getAll().subscribe({
+    this.emotionService.getAllWithCount().subscribe({
       next: (emotions) => {
         console.log('[EmotionManage] emotions loaded:', emotions.length);
         this.emotions = emotions;
@@ -71,7 +70,7 @@ export class EmotionManage implements OnInit {
 
     this.emotionService.create(data).subscribe({
       next: (created) => {
-        this.emotions.unshift(created);
+        this.emotions.unshift({ ...created, eventCount: 0 });
         this.formSuccess = `"${created.name}" foi cadastrada com sucesso!`;
         this.emotionForm.reset();
         this.formSubmitted = false;
