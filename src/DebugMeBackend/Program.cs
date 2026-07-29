@@ -81,7 +81,7 @@ builder.Services.AddSwaggerGen(options =>
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("DefaultConnection is not configured.");
 
-string databaseProvider = builder.Configuration["DatabaseProvider"] ?? "MySql";
+string databaseProvider = builder.Configuration["DatabaseProvider"] ?? "PostgreSql";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -89,9 +89,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     {
         options.UseSqlite(connectionString);
     }
-    else
+    else if (databaseProvider.Equals("MySql", StringComparison.OrdinalIgnoreCase))
     {
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    }
+    else
+    {
+        options.UseNpgsql(connectionString);
     }
 });
 
@@ -106,6 +110,12 @@ builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database");
 
 WebApplication app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
 
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
