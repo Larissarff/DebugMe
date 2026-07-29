@@ -116,7 +116,8 @@
               <div class="emotion-info">
                 <span class="emotion-name">{{ emotion.name }}</span>
                 <span class="emotion-desc" *ngIf="emotion.description">{{ emotion.description }}</span>
-            </div>
+              </div>
+              <span class="emotion-event-count">{{ emotion.eventCount || 0 }} registro(s)</span>
             </div>
           </div>
         </div>

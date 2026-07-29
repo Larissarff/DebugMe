@@ -19,6 +19,13 @@ namespace DebugMeBackend.Repositories
             return await _context.Emotions.ToListAsync();
         }
 
+        public async Task<IEnumerable<Emotion>> GetAllWithEventCountAsync()
+        {
+            return await _context.Emotions
+                .Include(e => e.EventLogs)
+                .ToListAsync();
+        }
+
         public async Task<Emotion?> GetByIdAsync(Guid id)
         {
             return await _context.Emotions.FirstOrDefaultAsync(e => e.Id == id);

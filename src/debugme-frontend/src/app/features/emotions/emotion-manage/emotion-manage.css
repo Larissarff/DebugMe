@@ -476,6 +476,18 @@
   border-radius: 8px;
 }
 
+.emotion-event-count {
+  font-size: 12px;
+  color: #643aa4;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  background: rgba(165, 96, 212, 0.08);
+  padding: 4px 12px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* ── Animations ── */
 @keyframes fadeInUp {
   from {
