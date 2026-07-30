@@ -266,6 +266,7 @@ docker run --name debugme-mysql \
 | [`AGENTS.md`](AGENTS.md) | Guia técnico completo para contribuidores e IAs |
 | [`docs/architecture.md`](docs/architecture.md) | Arquitetura do sistema, decisões e princípios |
 | [`docs/database/model.md`](docs/database/model.md) | Modelagem do banco de dados |
+| [`docs/decisions/`](docs/decisions/) | ADRs — registro de decisões arquiteturais |
 | [`docs/sprints/`](docs/sprints/) | Planejamento, reviews e retrospectivas de cada sprint |
 
 ---
