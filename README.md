@@ -295,7 +295,9 @@ O resultado é uma ferramenta que transforma a autoanálise em um processo estru
 
 ## 📌 Status
 
-🚧 **MVP concluído** — Deploy em produção no Render: [debugme-601s.onrender.com](https://debugme-601s.onrender.com)
+🚧 **MVP concluído** 
+— Deploy do backend em produção no Render: [debugme-601s.onrender.com](https://debugme-601s.onrender.com)
+— Deploy do frontend em produção no Render: [debugme-frontend.onrender.com](https://debugme-frontend.onrender.com)
 
 ---
 
