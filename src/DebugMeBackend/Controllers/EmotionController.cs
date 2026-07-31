@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DebugMeBackend.DTOs.Emotion;
 using DebugMeBackend.Entities;
 using DebugMeBackend.Services;
@@ -21,14 +22,16 @@ namespace DebugMeBackend.Controllers
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<Emotion>>> GetAll()
         {
-            IEnumerable<Emotion> emotions = await _emotionService.GetAllAsync();
+            Guid userId = GetUserIdFromToken();
+            IEnumerable<Emotion> emotions = await _emotionService.GetByUserIdAsync(userId);
             return Ok(emotions);
         }
 
         [HttpGet("all-with-count")]
         public async Task<ActionResult<IEnumerable<EmotionWithCountDto>>> GetAllWithCount()
         {
-            IEnumerable<EmotionWithCountDto> dtos = await _emotionService.GetAllWithEventCountAsync();
+            Guid userId = GetUserIdFromToken();
+            IEnumerable<EmotionWithCountDto> dtos = await _emotionService.GetAllWithUserEventCountAsync(userId);
             return Ok(dtos);
         }
 
@@ -68,7 +71,8 @@ namespace DebugMeBackend.Controllers
 
             try
             {
-                Emotion createdEmotion = await _emotionService.CreateAsync(emotion);
+                Guid userId = GetUserIdFromToken();
+                Emotion createdEmotion = await _emotionService.CreateAsync(emotion, userId);
 
                 return CreatedAtAction(
                     nameof(GetById),
@@ -112,6 +116,17 @@ namespace DebugMeBackend.Controllers
         {
             await _emotionService.DeleteAsync(id);
             return NoContent();
+        }
+
+        private Guid GetUserIdFromToken()
+        {
+            string? sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            if (sub is null || !Guid.TryParse(sub, out Guid userId))
+                throw new UnauthorizedAccessException("Token inválido: userId não encontrado.");
+
+            return userId;
         }
 
     }

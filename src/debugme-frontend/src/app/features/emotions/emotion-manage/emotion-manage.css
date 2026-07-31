@@ -522,4 +522,24 @@
   .list-card {
     padding: 22px 18px;
   }
+
+  .manage-header h1 {
+    font-size: 24px;
+  }
+
+  .header-subtitle {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 400px) {
+  .emotion-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .emotion-event-count {
+    align-self: flex-start;
+  }
 }

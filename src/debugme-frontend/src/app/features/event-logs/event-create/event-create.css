@@ -210,6 +210,22 @@
   transform: translateY(-50%) rotate(180deg);
 }
 
+.register-emotion-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #a560d4;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.register-emotion-link:hover {
+  color: #643aa4;
+  transform: translateX(2px);
+}
+
 /* Intensity Slider */
 .intensity-wrapper {
   display: flex;
@@ -473,5 +489,33 @@
 
   .card-header h1 {
     font-size: 24px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  .form-group label {
+    font-size: 12px;
+  }
+
+  .intensity-wrapper {
+    gap: 8px;
+  }
+
+  .intensity-legend {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 400px) {
+  .intensity-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .intensity-label {
+    font-size: 10px;
   }
 }

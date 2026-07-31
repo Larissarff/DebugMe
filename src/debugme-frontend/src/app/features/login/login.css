@@ -400,3 +400,39 @@
   font-style: italic;
   font-family: 'Inter', sans-serif;
 }
+
+/* ── Mobile responsive ── */
+@media (max-width: 600px) {
+  .login-page {
+    padding: 16px;
+    align-items: flex-start;
+    padding-top: 48px;
+  }
+
+  .login-card {
+    padding: 28px 22px;
+    border-radius: 24px;
+  }
+
+  .brand-logo {
+    max-width: 160px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+  }
+
+  .form-group label {
+    font-size: 12px;
+  }
+
+  .input-wrapper input {
+    height: 48px;
+    font-size: 14px;
+  }
+
+  .btn-submit {
+    height: 48px;
+    font-size: 14px;
+  }
+}

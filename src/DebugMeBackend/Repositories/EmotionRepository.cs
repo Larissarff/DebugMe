@@ -26,6 +26,34 @@ namespace DebugMeBackend.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Emotion>> GetAllWithUserEventCountAsync(Guid userId)
+        {
+            var result = await _context.Emotions
+                .Where(e => e.UserId == null || e.UserId == userId)
+                .Select(e => new
+                {
+                    Emotion = e,
+                    EventCount = e.EventLogs.Count(el => el.UserId == userId)
+                })
+                .ToListAsync();
+
+            return result.Select(x =>
+            {
+                return new Emotion
+                {
+                    Id = x.Emotion.Id,
+                    Name = x.Emotion.Name,
+                    Description = x.Emotion.Description,
+                    CreatedAt = x.Emotion.CreatedAt,
+                    UpdatedAt = x.Emotion.UpdatedAt,
+                    UserId = x.Emotion.UserId,
+                    EventLogs = Enumerable.Range(0, x.EventCount)
+                        .Select(_ => new EventLog())
+                        .ToList()
+                };
+            }).ToList();
+        }
+
         public async Task<Emotion?> GetByIdAsync(Guid id)
         {
             return await _context.Emotions.FirstOrDefaultAsync(e => e.Id == id);
@@ -34,6 +62,18 @@ namespace DebugMeBackend.Repositories
         public async Task<Emotion?> GetByNameAsync(string name)
         {
             return await _context.Emotions.FirstOrDefaultAsync(e => e.Name == name);
+        }
+
+        public async Task<Emotion?> GetByNameAndUserIdAsync(string name, Guid userId)
+        {
+            return await _context.Emotions.FirstOrDefaultAsync(e => e.Name == name && e.UserId == userId);
+        }
+
+        public async Task<IEnumerable<Emotion>> GetByUserIdAsync(Guid userId)
+        {
+            return await _context.Emotions
+                .Where(e => e.UserId == null || e.UserId == userId)
+                .ToListAsync();
         }
 
         public async Task AddAsync(Emotion emotion)

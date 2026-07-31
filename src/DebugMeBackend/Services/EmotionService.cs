@@ -13,7 +13,7 @@ namespace DebugMeBackend.Services
             _emotionRepository = emotionRepository;
         }
 
-        public async Task<Emotion> CreateAsync(Emotion emotion)
+        public async Task<Emotion> CreateAsync(Emotion emotion, Guid userId)
         {
             if (string.IsNullOrWhiteSpace(emotion.Name))
             {
@@ -22,7 +22,7 @@ namespace DebugMeBackend.Services
 
             string normalizedName = emotion.Name.Trim().ToLower();
 
-            Emotion? existingEmotion = await _emotionRepository.GetByNameAsync(normalizedName);
+            Emotion? existingEmotion = await _emotionRepository.GetByNameAndUserIdAsync(normalizedName, userId);
 
             if (existingEmotion is not null)
             {
@@ -33,7 +33,8 @@ namespace DebugMeBackend.Services
             {
                 Id = Guid.NewGuid(),
                 Name = normalizedName,
-                Description = emotion.Description?.Trim()
+                Description = emotion.Description?.Trim(),
+                UserId = userId
             };
 
             await _emotionRepository.AddAsync(newEmotion);
@@ -58,9 +59,9 @@ namespace DebugMeBackend.Services
             return await _emotionRepository.GetByNameAsync(normalizedName);
         }
 
-        public async Task<IEnumerable<Emotion>> GetAllAsync()
+        public async Task<IEnumerable<Emotion>> GetByUserIdAsync(Guid userId)
         {
-            return await _emotionRepository.GetAllAsync();
+            return await _emotionRepository.GetByUserIdAsync(userId);
         }
 
         public async Task<Emotion> UpdateAsync(Guid id, Emotion emotionEdited)
@@ -99,6 +100,20 @@ namespace DebugMeBackend.Services
         public async Task<IEnumerable<EmotionWithCountDto>> GetAllWithEventCountAsync()
         {
             IEnumerable<Emotion> emotions = await _emotionRepository.GetAllWithEventCountAsync();
+            return emotions.Select(e => new EmotionWithCountDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Description = e.Description,
+                EventCount = e.EventLogs?.Count ?? 0,
+                CreatedAt = e.CreatedAt,
+                UpdatedAt = e.UpdatedAt
+            });
+        }
+
+        public async Task<IEnumerable<EmotionWithCountDto>> GetAllWithUserEventCountAsync(Guid userId)
+        {
+            IEnumerable<Emotion> emotions = await _emotionRepository.GetAllWithUserEventCountAsync(userId);
             return emotions.Select(e => new EmotionWithCountDto
             {
                 Id = e.Id,

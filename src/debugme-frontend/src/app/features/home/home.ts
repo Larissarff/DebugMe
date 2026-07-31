@@ -33,6 +33,10 @@ export class Home implements OnInit, OnDestroy {
   currentMonthLabel = '';
   loadingCalendar = true;
 
+  selectedDateEvents: EventLog[] = [];
+  selectedDateLabel = '';
+  popupVisible = false;
+
   constructor(
     private authService: AuthService,
     private eventLogService: EventLogService
@@ -148,6 +152,41 @@ export class Home implements OnInit, OnDestroy {
     if (intensity <= 6) return '#a560d4';
     if (intensity <= 8) return '#7b3db8';
     return '#643aa4';
+  }
+
+  openDayPopup(day: CalendarDay): void {
+    if (!day.isCurrentMonth || day.count === 0) return;
+    this.selectedDateEvents = this.eventLogs.filter(log => {
+      const dateStr = log.eventDate?.slice(0, 10) || log.createdAt?.slice(0, 10);
+      return dateStr === day.date;
+    });
+    this.selectedDateLabel = this.formatDateLabel(day.date);
+    this.popupVisible = true;
+  }
+
+  closePopup(): void {
+    this.popupVisible = false;
+    this.selectedDateEvents = [];
+  }
+
+  formatDateLabel(dateStr: string): string {
+    const [year, month, day] = dateStr.split('-');
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    return date.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  formatEventTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  getEmotionName(log: EventLog): string {
+    return log.emotion?.name || 'Emoção';
   }
 
   logout(): void {

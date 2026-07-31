@@ -520,3 +520,258 @@
   font-style: italic;
   font-weight: 400;
 }
+
+/* ── Clickable calendar days ── */
+.calendar-day.has-events {
+  cursor: pointer;
+}
+
+.calendar-day.has-events:hover {
+  background: rgba(165, 96, 212, 0.1);
+}
+
+/* ── Day Detail Popup ── */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.popup-content {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(100, 58, 164, 0.2);
+  border: 1px solid rgba(165, 96, 212, 0.12);
+  animation: popupSlideUp 0.25s ease-out;
+}
+
+@keyframes popupSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(165, 96, 212, 0.1);
+}
+
+.popup-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #2d1b4e;
+  text-transform: capitalize;
+}
+
+.popup-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(165, 96, 212, 0.08);
+  color: #643aa4;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.popup-close:hover {
+  background: rgba(165, 96, 212, 0.18);
+  transform: scale(1.05);
+}
+
+.popup-body {
+  padding: 16px 24px 24px;
+}
+
+.popup-event {
+  padding: 14px 16px;
+  background: rgba(165, 96, 212, 0.04);
+  border-radius: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(165, 96, 212, 0.06);
+}
+
+.popup-event:last-child {
+  margin-bottom: 0;
+}
+
+.popup-event:hover {
+  background: rgba(165, 96, 212, 0.1);
+  transform: translateX(4px);
+}
+
+.popup-event-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.popup-emotion {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2d1b4e;
+  text-transform: capitalize;
+}
+
+.popup-intensity {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.popup-description {
+  margin: 0;
+  font-size: 13px;
+  color: #6b5b8a;
+  line-height: 1.5;
+}
+
+.popup-empty {
+  text-align: center;
+  padding: 20px;
+  color: #a89bc2;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Mobile responsive ── */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 20px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .app-logo {
+    height: 34px;
+  }
+
+  .home-content {
+    padding: 32px 16px 24px;
+  }
+
+  .welcome-section h2 {
+    font-size: 24px;
+  }
+
+  .welcome-text {
+    font-size: 14px;
+    max-width: 100%;
+    padding: 0 8px;
+  }
+
+  .dashboard-section {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .calendar-section {
+    flex: none;
+    max-width: 100%;
+  }
+
+  .calendar-card {
+    padding: 20px 16px;
+  }
+
+  .calendar-header h3 {
+    font-size: 16px;
+  }
+
+  .actions-column {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .action-card {
+    flex: 1 1 100%;
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .day-number {
+    font-size: 11px;
+  }
+
+  .day-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .popup-content {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .btn-logout {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  .user-greeting {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-weekdays {
+    font-size: 10px;
+  }
+
+  .calendar-day {
+    padding: 2px 1px;
+    border-radius: 6px;
+  }
+
+  .day-number {
+    font-size: 10px;
+  }
+
+  .calendar-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
