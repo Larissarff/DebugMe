@@ -57,6 +57,8 @@
                     class="calendar-day"
                     [class.today]="day.isToday"
                     [class.empty]="!day.isCurrentMonth"
+                    [class.has-events]="day.isCurrentMonth && day.count > 0"
+                    (click)="openDayPopup(day)"
                   >
                     @if (day.isCurrentMonth) {
                       <span class="day-number">{{ day.day }}</span>
@@ -121,4 +123,28 @@
       <p class="footer-quote">"Acolhimento, clareza e autoconsciência em um só lugar"</p>
     </footer>
   </main>
+
+  <!-- Day Detail Popup -->
+  <div class="popup-overlay" *ngIf="popupVisible" (click)="closePopup()">
+    <div class="popup-content" (click)="$event.stopPropagation()">
+      <div class="popup-header">
+        <h3>📅 {{ selectedDateLabel }}</h3>
+        <button class="popup-close" (click)="closePopup()">✕</button>
+      </div>
+      <div class="popup-body">
+        <div class="popup-event" *ngFor="let log of selectedDateEvents" [routerLink]="['/events']">
+          <div class="popup-event-top">
+            <span class="popup-emotion">{{ getEmotionName(log) }}</span>
+            <span class="popup-intensity" [style.background]="getIntensityColor(log.intensity)">
+              {{ log.intensity }}/10
+            </span>
+          </div>
+          <p class="popup-description">{{ log.description || 'Sem descrição' }}</p>
+        </div>
+        <div class="popup-empty" *ngIf="selectedDateEvents.length === 0">
+          Nenhum registro neste dia.
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

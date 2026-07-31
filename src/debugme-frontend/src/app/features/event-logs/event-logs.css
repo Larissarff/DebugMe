@@ -507,6 +507,10 @@
     gap: 16px;
   }
 
+  .list-header h1 {
+    font-size: 24px;
+  }
+
   .btn-new {
     width: 100%;
     justify-content: center;
@@ -521,9 +525,25 @@
     flex-direction: column;
   }
 
+  .card-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
   .btn-delete {
     margin-left: 0;
     margin-top: 14px;
     align-self: flex-end;
+  }
+
+  .sparkline-chart {
+    height: 48px;
+  }
+}
+
+@media (max-width: 400px) {
+  .card-main {
+    padding: 0;
   }
 }

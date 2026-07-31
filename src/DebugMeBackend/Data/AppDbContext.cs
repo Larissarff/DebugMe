@@ -50,6 +50,11 @@ namespace DebugMeBackend.Data
 
                 entity.Property(e => e.Description)
                       .HasMaxLength(250);
+
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<EventLog>(entity =>

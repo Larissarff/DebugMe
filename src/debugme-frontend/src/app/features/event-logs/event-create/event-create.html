@@ -42,6 +42,9 @@
           </select>
           <span class="select-arrow">▼</span>
         </div>
+        <a routerLink="/emotions/manage" class="register-emotion-link">
+          ✦ Cadastrar nova emoção
+        </a>
         <small class="error" *ngIf="submitted && emotionId?.errors?.['required']">
           Selecione a emoção que melhor descreve seu momento.
         </small>
